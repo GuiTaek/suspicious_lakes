@@ -1,0 +1,14 @@
+{
+	"structures": [
+		{
+			"structure": "suspicious_lakes:suspicious_lake",
+			"weight": 1
+		}
+	],
+	"placement": {
+		"type": "suspicious_lakes:suspicious_lake_placement",
+		"salt": 478392748,
+		"spacing": 11,
+		"separation": 6
+	}
+}

@@ -1,20 +1,17 @@
 package com.gmail.guitaekm.enderlakes;
 
-import com.mojang.datafixers.types.templates.Tag;
+import com.gmail.guitaekm.enderlakes.lakes.Features;
+import com.gmail.guitaekm.enderlakes.lakes.Structures;
 import net.fabricmc.api.ModInitializer;
 
-import net.fabricmc.fabric.api.block.v1.FabricBlock;
 import net.minecraft.block.*;
 import net.minecraft.block.piston.PistonBehavior;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
 import net.minecraft.item.BucketItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKeys;
@@ -29,7 +26,7 @@ public class Enderlakes implements ModInitializer {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-	public static final Config CONFIG = Config.createAndLoad();
+	public static final ConfigInstance CONFIG = new ConfigInstance();
 
 	public static final FlowableFluid SUSPICIOUS_LIQUID_STILL_FLUID = Registry.register(
 			Registries.FLUID,
@@ -79,5 +76,7 @@ public class Enderlakes implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+        Structures.load();
+        Features.load();
 	}
 }
