@@ -2,11 +2,56 @@
 	"fallback": "minecraft:empty",
 	"elements": [
       {
+        "weight": 2.0,
+        "element": {
+          "location": "suspicious_lakes:small_lake_1",
+          "processors": "minecraft:empty",
+          "projection": "rigid",
+          "element_type": "minecraft:single_pool_element"
+        }
+      },
+      {
+        "weight": 2.0,
+        "element": {
+          "location": "suspicious_lakes:small_lake_2",
+          "processors": "minecraft:empty",
+          "projection": "rigid",
+          "element_type": "minecraft:single_pool_element"
+        }
+      },
+      {
+        "weight": 2.0,
+        "element": {
+          "location": "suspicious_lakes:small_lake_3",
+          "processors": "minecraft:empty",
+          "projection": "rigid",
+          "element_type": "minecraft:single_pool_element"
+        }
+      },
+      {
+        "weight": 2.0,
+        "element": {
+          "location": "suspicious_lakes:small_lake_4",
+          "processors": "minecraft:empty",
+          "projection": "rigid",
+          "element_type": "minecraft:single_pool_element"
+        }
+      },
+      {
+        "weight": 2.0,
+        "element": {
+          "location": "suspicious_lakes:medium_lake_1",
+          "processors": "minecraft:empty",
+          "projection": "rigid",
+          "element_type": "minecraft:single_pool_element"
+        }
+      },
+      {
         "weight": 1.0,
         "element": {
-          "location": "suspicious_lakes:suspicious_lake",
+          "location": "suspicious_lakes:big_lake_1",
           "processors": "minecraft:empty",
-          "projection": "terrain_matching",
+          "projection": "rigid",
           "element_type": "minecraft:single_pool_element"
         }
       }
