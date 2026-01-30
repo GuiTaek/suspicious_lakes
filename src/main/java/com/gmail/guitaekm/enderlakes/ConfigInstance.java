@@ -4,7 +4,7 @@ import java.util.List;
 
 public record ConfigInstance (
         int nrLakes,
-        int powerDistance,
+        double powerDistance,
         List<Integer> cycleWeights,
         int minimumDistance
 ) {
