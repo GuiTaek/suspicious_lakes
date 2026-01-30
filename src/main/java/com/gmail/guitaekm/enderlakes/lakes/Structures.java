@@ -30,5 +30,11 @@ public class Structures {
             () -> FeatureStructure.CODEC
     );
 
+    public static StructureType<SuspiciousLakeStructure> SUSPICIOUS_LAKE_STRUCTURE = Registry.register(
+            Registries.STRUCTURE_TYPE,
+            Identifier.of(Enderlakes.MOD_ID, "suspicious_lake_structure"),
+            () -> SuspiciousLakeStructure.CODEC
+    );
+
     public static void load() { }
 }
