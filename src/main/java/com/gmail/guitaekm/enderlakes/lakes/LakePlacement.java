@@ -58,7 +58,7 @@ public class LakePlacement extends RandomSpreadStructurePlacement {
                     .forGetter(LakePlacement::getSpreadType),
             Codec
                     .intRange(0, Integer.MAX_VALUE)
-                    .fieldOf("separation")
+                    .fieldOf("g")
                     .forGetter(LakePlacement::g)
 
     ).apply(instance, instance.stable(LakePlacement::new)));
