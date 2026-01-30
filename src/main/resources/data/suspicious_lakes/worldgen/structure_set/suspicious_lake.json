@@ -9,6 +9,11 @@
 		"type": "suspicious_lakes:suspicious_lake_placement",
 		"salt": 478392748,
 		"spacing": 11,
-		"separation": 6
+		"separation": 6,
+        "locate_offset": [
+          8, 0, 8
+        ],
+      // non-functional atm
+        "g": 11
 	}
 }
