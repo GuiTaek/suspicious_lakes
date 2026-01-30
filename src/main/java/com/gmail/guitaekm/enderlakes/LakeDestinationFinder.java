@@ -56,7 +56,7 @@ public class LakeDestinationFinder {
 
     public static GridPos c(int i) {
         if (i <= 0) {
-            throw new IllegalArgumentException("give non-negative input to c");
+            throw new IllegalArgumentException("give positive input to c");
         }
         int i2 = i - 1;
         // the ordering isn't relevant, because of g therefore no beautiful bijection
