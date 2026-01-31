@@ -6,16 +6,19 @@ public record ConfigInstance (
         int nrLakes,
         double powerDistance,
         List<Integer> cycleWeights,
-        int minimumDistance
+        int minimumDistance,
+        int[] factsPhi
 ) {
     public ConfigInstance() {
         this(
                 new ConfigModel().nrLakes,
                 new ConfigModel().powerDistance,
                 new ConfigModel().cycleWeights,
-                new ConfigModel().minimumDistance
+                new ConfigModel().minimumDistance,
+                new ConfigModel().factsPhi
         );
     }
+    /*
     public ConfigInstance(Config config) {
         this(
                 config.nrLakes(),
@@ -24,4 +27,5 @@ public record ConfigInstance (
                 config.minimumDistance()
         );
     }
+     */
 }

@@ -4,6 +4,7 @@ import com.google.common.collect.Streams;
 import net.minecraft.util.math.random.Random;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -261,21 +262,27 @@ public class LakeDestinationFinder {
         return nearestLake;
     }
 
-
-
-    public static boolean isPrimitiveRoot(int g, int n) {
-        // needs long time for big numbers
-        assert n <= 10000000;
-        assert isPrime(n);
+    public static boolean isPrimitiveRootFast(int g, int n, int[] factsPhi) {
         // n is asserted to be a prime number
         int phiN = n - 1;
-        // primeFactors(phiN) could be a constant saved in the code
-        for (int fact : primeFactors(phiN)) {
+        for (int fact : factsPhi) {
             if (modularExponentiationBySquaring(g, phiN / fact, n) == 1) {
                 return false;
             }
         }
         return true;
+    }
+
+
+    public static boolean isPrimitiveRootSlow(int g, int n) {
+        assert n <= 10_000_000;
+        assert isPrime(n);
+        // n is asserted to be a prime number
+        int phiN = n - 1;
+        // primeFactors(phiN) could be a constant saved in the code
+        int[] factsPhi = primeFactors(phiN).stream().mapToInt(i -> i).toArray();
+        return isPrimitiveRootFast(g, n, factsPhi);
+
     }
 
     // from https://en.wikipedia.org/wiki/Modular_exponentiation#Pseudocode
@@ -323,7 +330,7 @@ public class LakeDestinationFinder {
     // from https://stackoverflow.com/a/6233030/3289974
     public static ArrayList<Integer> primeFactors(int num)
     {
-        assert num < 10000000;
+        assert num < 300_000_000;
         ArrayList<Integer> factors = new ArrayList<>();
         for (int a = 2;  num>1; ) {
             if (num%a==0) {
@@ -334,6 +341,7 @@ public class LakeDestinationFinder {
                 a++;
             }
         }
+        Collections.sort(factors);
         return factors;
     }
 

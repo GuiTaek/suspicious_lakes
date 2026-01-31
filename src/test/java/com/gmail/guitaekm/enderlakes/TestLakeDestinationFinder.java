@@ -2,7 +2,8 @@ package com.gmail.guitaekm.enderlakes;
 
 import com.gmail.guitaekm.enderlakes.LakeDestinationFinder.ChunkPos;
 import com.gmail.guitaekm.enderlakes.LakeDestinationFinder.GridPos;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,7 +18,8 @@ public class TestLakeDestinationFinder {
             List.of(
                     1, 4, 3, 4, 0, 6
             ),
-            new ConfigModel().minimumDistance
+            new ConfigModel().minimumDistance,
+            new int[] {2, 3, 3}
     );
     static ConfigInstance CONFIG =  new ConfigInstance();
 
@@ -245,7 +247,7 @@ public class TestLakeDestinationFinder {
         int n = CONFIG.nrLakes();
         for (int i = 0; i < 100; i++) {
             int g = new Random().nextInt(CONFIG.nrLakes());
-            if (LakeDestinationFinder.isPrimitiveRoot(g, n)) {
+            if (LakeDestinationFinder.isPrimitiveRootFast(g, n, CONFIG.factsPhi())) {
                 counter++;
             }
         }
@@ -255,20 +257,26 @@ public class TestLakeDestinationFinder {
     @Test
     public void testIsPrimitiveRoot() {
         Random random = new Random(42);
+        // no that the prime number is so big, this code isn't possible to be run through because the
+        // memory that isPrimitiveRootSlow needs is so inefficient (it was optimized to be mathematically
+        // exact, not fast or memory efficient)
+        /*
         {
             int n = CONFIG.nrLakes();
             for (int i = 0; i < 1; i++) {
                 int g = random.nextInt(2, n);
                 boolean expected = isPrimitiveRootSlow(g, n);
-                boolean actual = LakeDestinationFinder.isPrimitiveRoot(g, n);
+                boolean actual = LakeDestinationFinder.isPrimitiveRootFast(g, n, CONFIG.factsPhi());
                 assertEquals(expected, actual);
             }
         }
+         */
         for (int i = 0; i < 10000; i++) {
             int g = random.nextInt(2, 1000);
             int n = random.nextInt(g + 1, 2000);
             while (!LakeDestinationFinder.isPrime(n)) n++;
-            assertEquals(isPrimitiveRootSlow(g, n), LakeDestinationFinder.isPrimitiveRoot(g, n));
+            int[] factsPhi = LakeDestinationFinder.primeFactors(n - 1).stream().mapToInt(fact -> fact).toArray();
+            assertEquals(isPrimitiveRootSlow(g, n), LakeDestinationFinder.isPrimitiveRootFast(g, n, factsPhi));
         }
     }
 

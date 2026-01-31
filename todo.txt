@@ -1,0 +1,19 @@
+- fix height (erl.)
+- fix air block in structure (erl.)
+
+- test if it generates on land correctly (erl.)
+- test if the gap between void and lake is correct (erl.)
+
+- change g
+
+- remove deprecated infrastructure
+- remove some json fields that are not used
+
+- config entkoppeln
+- fix g implementation
+
+- test for performance
+- update fabric
+- implement teleport logic
+- generate a single source to do the least destruction
+- update at least to minecraft:1.21.1
