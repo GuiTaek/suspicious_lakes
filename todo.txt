@@ -4,9 +4,9 @@
 - test if it generates on land correctly (erl.)
 - test if the gap between void and lake is correct (erl.)
 
-- change g
+- change g (erl.)
 
-- remove deprecated infrastructure
+- remove deprecated infrastructure (erl.)
 - remove some json fields that are not used
 
 - config entkoppeln

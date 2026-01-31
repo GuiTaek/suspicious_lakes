@@ -1,14 +1,8 @@
 package com.gmail.guitaekm.enderlakes;
 
-/*
-import io.wispforest.owo.config.annotation.Config;
-import io.wispforest.owo.config.annotation.Modmenu;
-import io.wispforest.owo.config.annotation.RangeConstraint;
-*/
-
 import java.util.List;
 
-public class ConfigModel {
+public class ConfigValues {
     public int nrLakes = 276_987_611;
     public double powerDistance = 1.7;
     public List<Integer> cycleWeights = List.of(

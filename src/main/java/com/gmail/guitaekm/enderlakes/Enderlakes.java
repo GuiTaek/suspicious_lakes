@@ -1,6 +1,5 @@
 package com.gmail.guitaekm.enderlakes;
 
-import com.gmail.guitaekm.enderlakes.lakes.Features;
 import com.gmail.guitaekm.enderlakes.lakes.Structures;
 import net.fabricmc.api.ModInitializer;
 
@@ -18,7 +17,6 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.Heightmap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,6 +76,5 @@ public class Enderlakes implements ModInitializer {
 	@Override
 	public void onInitialize() {
         Structures.load();
-        Features.load();
 	}
 }

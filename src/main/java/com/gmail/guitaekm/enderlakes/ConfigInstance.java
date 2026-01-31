@@ -11,21 +11,11 @@ public record ConfigInstance (
 ) {
     public ConfigInstance() {
         this(
-                new ConfigModel().nrLakes,
-                new ConfigModel().powerDistance,
-                new ConfigModel().cycleWeights,
-                new ConfigModel().minimumDistance,
-                new ConfigModel().factsPhi
+                new ConfigValues().nrLakes,
+                new ConfigValues().powerDistance,
+                new ConfigValues().cycleWeights,
+                new ConfigValues().minimumDistance,
+                new ConfigValues().factsPhi
         );
     }
-    /*
-    public ConfigInstance(Config config) {
-        this(
-                config.nrLakes(),
-                config.powerDistance(),
-                config.cycleWeights(),
-                config.minimumDistance()
-        );
-    }
-     */
 }

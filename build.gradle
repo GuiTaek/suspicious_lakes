@@ -40,24 +40,6 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	//modImplementation "io.wispforest:owo-lib:${project.owo_version}"
-	//include "io.wispforest:owo-sentinel:${project.owo_version}"
-	// has to be commented out when it's not needed, needed on generating the config
-	// annotationProcessor modImplementation("io.wispforest:owo-lib:${project.owo_version}")
-	//testImplementation(platform("org.junit:junit-bom:5.10.3"))
-	//testImplementation("org.junit.jupiter:junit-jupiter")
-    /*
-    testImplementation files("build/client-sources.jar")
-    testImplementation files("build/common-sources.jar")
-    // from https://stackoverflow.com/a/17124244/3289974
-    def file = new File('build/common.jar')
-    if (!file.exists()) {
-        new URL("https://piston-data.mojang.com/v1/objects/450698d1863ab5180c25d7c804ef0fe6369dd1ba/server.jar")
-                .withInputStream{ i -> file.withOutputStream{ it << i }}
-    }
-    testImplementation files("build/common.jar")
-
-     */
     testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
 	implementation group: 'com.google.guava', name: 'guava', version: '33.3.1-jre'
 	}
@@ -116,7 +98,7 @@ test {
 		events "passed", "skipped", "failed"
 	}
 }
-/*
+
 fabricApi {
     configureTests {
         createSourceSet = false
@@ -126,4 +108,3 @@ fabricApi {
         eula = true // By setting this to true, you agree to the Minecraft EULA.
     }
 }
- */

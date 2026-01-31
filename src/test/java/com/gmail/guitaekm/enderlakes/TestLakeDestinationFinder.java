@@ -14,11 +14,11 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestLakeDestinationFinder {
     static ConfigInstance smallPrimeConfig = new ConfigInstance(
             19,
-            new ConfigModel().powerDistance,
+            new ConfigValues().powerDistance,
             List.of(
                     1, 4, 3, 4, 0, 6
             ),
-            new ConfigModel().minimumDistance,
+            new ConfigValues().minimumDistance,
             new int[] {2, 3, 3}
     );
     static ConfigInstance CONFIG =  new ConfigInstance();
