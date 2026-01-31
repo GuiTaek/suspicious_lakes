@@ -63,7 +63,7 @@ public class SuspiciousLakeStructure extends Structure {
                 context.world(),
                 context.noiseConfig()
         );
-        int y = Math.max(context.world().getBottomY() + 1, surface - this.depth);
+        int y = Math.max(context.world().getBottomY() + 1, surface - this.depth + 1);
         // this is to make sure the player never falls to death, the coordinates where the player is supposed to land on are 8, 8
         BlockPos blockPos = pos.getBlockPos(11, y, 5);
 
