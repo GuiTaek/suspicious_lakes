@@ -20,67 +20,15 @@ public class LakePlacement extends RandomSpreadStructurePlacement {
     // we can now have structures spawn based on distance from world center.
     public static final MapCodec<LakePlacement> CODEC = RecordCodecBuilder.mapCodec(
             (instance) -> instance.group(
-                    Vec3i
-                            .createOffsetCodec(16)
-                            .optionalFieldOf("locate_offset", Vec3i.ZERO)
-                            .forGetter(LakePlacement::getLocateOffset),
-                    StructurePlacement
-                            .FrequencyReductionMethod
-                            .CODEC
-                            .optionalFieldOf(
-                                    "frequency_reduction_method",
-                                    StructurePlacement.FrequencyReductionMethod.DEFAULT
-                            ).forGetter(LakePlacement::getFrequencyReductionMethod),
-            Codec
-                    .floatRange(0.0F, 1.0F)
-                    .optionalFieldOf("frequency", 1.0F)
-                    .forGetter(LakePlacement::getFrequency),
             Codecs
                     .NONNEGATIVE_INT
                     .fieldOf("salt")
-                    .forGetter(LakePlacement::getSalt),
-            StructurePlacement
-                    .ExclusionZone
-                    .CODEC
-                    .optionalFieldOf("exclusion_zone")
-                    .forGetter(LakePlacement::getExclusionZone),
-            Codec
-                    .intRange(0, Integer.MAX_VALUE)
-                    .fieldOf("spacing")
-                    .forGetter(LakePlacement::getSpacing),
-            Codec
-                    .intRange(0, Integer.MAX_VALUE)
-                    .fieldOf("separation")
-                    .forGetter(LakePlacement::getSeparation),
-            SpreadType
-                    .CODEC
-                    .optionalFieldOf("spread_type", SpreadType.LINEAR)
-                    .forGetter(LakePlacement::getSpreadType),
-            Codec
-                    .intRange(0, Integer.MAX_VALUE)
-                    .fieldOf("g")
-                    .forGetter(LakePlacement::g)
+                    .forGetter(LakePlacement::getSalt)
 
     ).apply(instance, instance.stable(LakePlacement::new)));
-    public final int g;
 
-    public int g() {
-        return g;
-    }
-
-    public LakePlacement(
-            Vec3i locateOffset,
-            FrequencyReductionMethod frequencyReductionMethod,
-            float frequency,
-            int salt,
-            Optional<ExclusionZone> exclusionZone,
-            int spacing,
-            int separation,
-            SpreadType spreadType,
-            int g
-    ) {
-        super(locateOffset, frequencyReductionMethod, frequency, salt, exclusionZone, spacing, separation, spreadType);
-        this.g = g;
+    public LakePlacement(int salt) {
+        super(new Vec3i(0, 0, 0), StructurePlacement.FrequencyReductionMethod.DEFAULT, 1.0f, salt, Optional.empty(), 1, 0, SpreadType.LINEAR);
     }
 
     @Override

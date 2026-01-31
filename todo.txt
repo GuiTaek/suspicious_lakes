@@ -9,10 +9,13 @@
 - remove deprecated infrastructure (erl.)
 - remove some json fields that are not used
 
-- config entkoppeln
-- fix g implementation
+- config entkoppeln (erl.)
+- fix g implementation (not wanted anymore)
 
-- test for performance
+- test for performance (erl.)
+
+! turn off rotation of lakes
+
 - update fabric
 - implement teleport logic
 - generate a single source to do the least destruction
