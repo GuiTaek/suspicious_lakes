@@ -63,9 +63,14 @@ public class SuspiciousLakeStructure extends Structure {
                 context.world(),
                 context.noiseConfig()
         );
-        int y = Math.max(context.world().getBottomY() + 1, surface - this.depth + 1);
+        int y;
+        if (context.world().getBottomY() == surface) {
+            y = context.random().nextBetween(context.world().getBottomY() + 2, context.world().getTopY() - 10);
+        } else {
+            y = surface - this.depth + 2;
+        }
         // this is to make sure the player never falls to death, the coordinates where the player is supposed to land on are 8, 8
-        BlockPos blockPos = pos.getBlockPos(11, y, 5);
+        BlockPos blockPos = pos.getBlockPos(0, y, 0);
 
         // starting from here, it's from TelepathicGrunt's Structure Tutorial
         // Optional thing to control whether the structure will be waterlogged when replacing pre-existing water in the world.
@@ -90,7 +95,7 @@ public class SuspiciousLakeStructure extends Structure {
                 // Definitely keep this an empty optional when placing structures in the nether as otherwise, heightmap placing will put the structure on the Bedrock roof.
                 30, // Maximum limit for how far pieces can spawn from center. You cannot set this bigger than 128 or else pieces gets cutoff.
                 StructurePoolAliasLookup.EMPTY, // Optional thing that allows swapping a template pool with another per structure json instance. We don't need this but see vanilla JigsawStructure class for how to wire it up if you want it.
-                new DimensionPadding(this.depth, 0), // Optional thing to prevent generating too close to the bottom or top of the dimension.
+                DimensionPadding.NONE, // Optional thing to prevent generating too close to the bottom or top of the dimension.
                 StructureLiquidSettings.IGNORE_WATERLOGGING);
     }
 
