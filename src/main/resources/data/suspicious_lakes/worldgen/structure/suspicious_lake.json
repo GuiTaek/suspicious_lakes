@@ -7,10 +7,6 @@
     "biomes": "#suspicious_lakes:has_structure/suspicious_lake",
     "step": "lakes",
     "spawn_overrides":{ },
-    "start_height": {
-      "absolute": -3
-    },
-    "project_start_to_heightmap": "WORLD_SURFACE_WG",
     "use_expansion_hack": false
   },
   "heightmap": "WORLD_SURFACE_WG",
