@@ -37,18 +37,27 @@ public class SuspiciousLakeStructure extends Structure {
                     Config.CODEC.fieldOf("config").forGetter(SuspiciousLakeStructure::config),
                     StructurePool.REGISTRY_CODEC.fieldOf("start_pool").forGetter(SuspiciousLakeStructure::startPool),
                     Codecs.POSITIVE_INT.fieldOf("depth").forGetter(SuspiciousLakeStructure::depth),
-                    Heightmap.Type.CODEC.fieldOf("heightmap").forGetter(SuspiciousLakeStructure::heightmap)
+                    Heightmap.Type.CODEC.fieldOf("heightmap").forGetter(SuspiciousLakeStructure::heightmap),
+                    Vec3i.CODEC.optionalFieldOf("offset", Vec3i.ZERO).forGetter(SuspiciousLakeStructure::offset)
             ).apply(codecBuilder, SuspiciousLakeStructure::new)
     );
     public final int depth;
     public final Heightmap.Type heightmap;
-    RegistryEntry<StructurePool> startPool;
+    public final RegistryEntry<StructurePool> startPool;
+    public final Vec3i offset;
 
-    protected SuspiciousLakeStructure(Config config, RegistryEntry<StructurePool> startPool, int depth, Heightmap.Type heightmap) {
+    protected SuspiciousLakeStructure(
+            Config config,
+            RegistryEntry<StructurePool> startPool,
+            int depth,
+            Heightmap.Type heightmap,
+            Vec3i offset
+    ) {
         super(config);
         this.depth = depth;
         this.heightmap = heightmap;
         this.startPool = startPool;
+        this.offset = offset;
     }
 
     public Config config() {
@@ -65,6 +74,10 @@ public class SuspiciousLakeStructure extends Structure {
 
     public Heightmap.Type heightmap() {
         return this.heightmap;
+    }
+
+    public Vec3i offset() {
+        return offset;
     }
 
     @Override
@@ -88,7 +101,8 @@ public class SuspiciousLakeStructure extends Structure {
             y = surface - this.depth;
         }
         // this is to make sure the player never falls to death, the coordinates where the player is supposed to land on are 8, 8
-        BlockPos blockPos = pos.getBlockPos(8, y, 8);
+        BlockPos blockPos = pos.getBlockPos(0, y, 0);
+        blockPos = blockPos.add(offset);
 
         // starting from here, it's from TelepathicGrunt's Structure Tutorial
         // Optional thing to control whether the structure will be waterlogged when replacing pre-existing water in the world.
@@ -124,7 +138,6 @@ public class SuspiciousLakeStructure extends Structure {
                 StructurePoolAliasLookup aliasLookup,
                 StructureLiquidSettings liquidSettings
         ) {
-            System.out.println(new ChunkPos(pos));
             DynamicRegistryManager dynamicRegistryManager = context.dynamicRegistryManager();
             ChunkGenerator chunkGenerator = context.chunkGenerator();
             StructureTemplateManager structureTemplateManager = context.structureTemplateManager();

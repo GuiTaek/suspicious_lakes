@@ -10,5 +10,6 @@
     "use_expansion_hack": false
   },
   "heightmap": "WORLD_SURFACE_WG",
-  "depth": 4
+  "depth": 4,
+  "offset": [8, 0, 8]
 }

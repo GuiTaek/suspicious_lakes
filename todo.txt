@@ -14,7 +14,9 @@
 
 - test for performance (erl.)
 
-! turn off rotation of lakes
+! turn off rotation of lakes (erl.)
+
+- fix block in small_lake_1.nbt
 
 - update fabric
 - implement teleport logic

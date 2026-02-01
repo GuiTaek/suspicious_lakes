@@ -15,9 +15,6 @@ import java.util.Set;
 
 public class LakePlacement extends RandomSpreadStructurePlacement {
 
-
-    // Special codec where we tacked on a "min_distance_from_world_origin" field so
-    // we can now have structures spawn based on distance from world center.
     public static final MapCodec<LakePlacement> CODEC = RecordCodecBuilder.mapCodec(
             (instance) -> instance.group(
             Codecs
