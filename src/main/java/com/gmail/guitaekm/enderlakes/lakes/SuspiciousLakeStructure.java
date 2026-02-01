@@ -145,19 +145,18 @@ public class SuspiciousLakeStructure extends Structure {
             ChunkRandom chunkRandom = context.random();
             Registry<StructurePool> registry = dynamicRegistryManager.get(RegistryKeys.TEMPLATE_POOL);
             BlockRotation blockRotation = BlockRotation.random(chunkRandom);
-            blockRotation = BlockRotation.NONE;
             StructurePool structurePoolWithDefault = structurePool.getKey()
                     .flatMap(
                             (key) -> registry.getOrEmpty(aliasLookup.lookup(key)))
                     .orElse(structurePool.value());
             StructurePoolElement structurePoolElement = structurePoolWithDefault.getRandomElement(chunkRandom);
-            Vec3i offset = structurePoolElement
-                    .getBoundingBox(structureTemplateManager, new BlockPos(0, 0, 0), blockRotation)
-                    .getCenter().withY(0);
-            BlockPos blockPos2 = pos.subtract(offset);
-            PoolStructurePiece poolStructurePiece = new PoolStructurePiece(structureTemplateManager, structurePoolElement, blockPos2, structurePoolElement.getGroundLevelDelta(), blockRotation, structurePoolElement.getBoundingBox(structureTemplateManager, blockPos2, blockRotation), liquidSettings);
+            BlockBox tempBoundingBox = structurePoolElement
+                    .getBoundingBox(structureTemplateManager, new BlockPos(0, 0, 0), blockRotation);
+            Vec3i structureOffset = tempBoundingBox.getCenter().withY(0);
+            BlockPos blockPos = pos.subtract(structureOffset);
+            PoolStructurePiece poolStructurePiece = new PoolStructurePiece(structureTemplateManager, structurePoolElement, blockPos, structurePoolElement.getGroundLevelDelta(), blockRotation, structurePoolElement.getBoundingBox(structureTemplateManager, blockPos, blockRotation), liquidSettings);
             BlockBox blockBox = poolStructurePiece.getBoundingBox();
-            return Optional.of(new Structure.StructurePosition(blockPos2, (collector) -> {
+            return Optional.of(new StructurePosition(blockPos, (collector) -> {
                 List<PoolStructurePiece> list = Lists.newArrayList();
                 list.add(poolStructurePiece);
                 if (size > 0) {
