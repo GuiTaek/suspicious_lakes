@@ -1,20 +1,34 @@
 package com.gmail.guitaekm.enderlakes.lakes;
 
+import com.google.common.collect.Lists;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.structure.PoolStructurePiece;
 import net.minecraft.structure.StructureLiquidSettings;
+import net.minecraft.structure.StructureTemplateManager;
 import net.minecraft.structure.pool.StructurePool;
 import net.minecraft.structure.pool.StructurePoolBasedGenerator;
+import net.minecraft.structure.pool.StructurePoolElement;
 import net.minecraft.structure.pool.alias.StructurePoolAliasLookup;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.dynamic.Codecs;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.function.BooleanBiFunction;
+import net.minecraft.util.math.*;
+import net.minecraft.util.math.random.ChunkRandom;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.HeightLimitView;
 import net.minecraft.world.Heightmap;
-import net.minecraft.world.gen.structure.DimensionPadding;
+import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.structure.Structure;
 import net.minecraft.world.gen.structure.StructureType;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class SuspiciousLakeStructure extends Structure {
@@ -64,13 +78,17 @@ public class SuspiciousLakeStructure extends Structure {
                 context.noiseConfig()
         );
         int y;
-        if (context.world().getBottomY() == surface) {
-            y = context.random().nextBetween(context.world().getBottomY() + 2, context.world().getTopY() - 10);
+        if (surface - depth <= context.world().getBottomY()) {
+            if (surface > context.world().getBottomY()) {
+                y = 1;
+            } else {
+                y = context.random().nextBetween(context.world().getBottomY() + 2, context.world().getTopY() - 10);
+            }
         } else {
-            y = surface - this.depth + 2;
+            y = surface - this.depth;
         }
         // this is to make sure the player never falls to death, the coordinates where the player is supposed to land on are 8, 8
-        BlockPos blockPos = pos.getBlockPos(0, y, 0);
+        BlockPos blockPos = pos.getBlockPos(8, y, 8);
 
         // starting from here, it's from TelepathicGrunt's Structure Tutorial
         // Optional thing to control whether the structure will be waterlogged when replacing pre-existing water in the world.
@@ -82,25 +100,66 @@ public class SuspiciousLakeStructure extends Structure {
          */
 
         // Return the pieces generator that is now set up so that the game runs it when it needs to create the layout of structure pieces.
-        return StructurePoolBasedGenerator.generate(
-                context, // Used for StructurePoolBasedGenerator to get all the proper behaviors done.
-                this.startPool, // The starting pool to use to create the structure layout from
-                Optional.empty(), // Can be used to only spawn from one Jigsaw block. But we don't need to worry about this.
-                1, // How deep a branch of pieces can go away from center piece. (5 means branches cannot be longer than 5 pieces from center piece)
-                blockPos, // Where to spawn the structure.
-                false, // "useExpansionHack" This is for legacy villages to generate properly. You should keep this false always.
-                Optional.empty(), // Adds the terrain height's y value to the passed in blockpos's y value. (This uses WORLD_SURFACE_WG heightmap which stops at top water too)
-                // Here at projectStartToHeightmap, start_height's y value is -1 which means the structure spawn -1 blocks below terrain height if start_height and project_start_to_heightmap is defined in structure JSON.
-                // Set projectStartToHeightmap to be empty optional for structure to be place only at the passed in blockpos's Y value instead.
-                // Definitely keep this an empty optional when placing structures in the nether as otherwise, heightmap placing will put the structure on the Bedrock roof.
-                30, // Maximum limit for how far pieces can spawn from center. You cannot set this bigger than 128 or else pieces gets cutoff.
-                StructurePoolAliasLookup.EMPTY, // Optional thing that allows swapping a template pool with another per structure json instance. We don't need this but see vanilla JigsawStructure class for how to wire it up if you want it.
-                DimensionPadding.NONE, // Optional thing to prevent generating too close to the bottom or top of the dimension.
-                StructureLiquidSettings.IGNORE_WATERLOGGING);
+        return Generator.generate(
+                context,
+                this.startPool,
+                1,
+                blockPos,
+                StructurePoolAliasLookup.EMPTY,
+                StructureLiquidSettings.IGNORE_WATERLOGGING
+        );
     }
 
     @Override
     public StructureType<?> getType() {
         return Structures.SUSPICIOUS_LAKE_STRUCTURE;
+    }
+
+    public static class Generator {
+        public static Optional<StructurePosition> generate(
+                Context context,
+                RegistryEntry<StructurePool> structurePool,
+                int size,
+                BlockPos pos,
+                StructurePoolAliasLookup aliasLookup,
+                StructureLiquidSettings liquidSettings
+        ) {
+            System.out.println(new ChunkPos(pos));
+            DynamicRegistryManager dynamicRegistryManager = context.dynamicRegistryManager();
+            ChunkGenerator chunkGenerator = context.chunkGenerator();
+            StructureTemplateManager structureTemplateManager = context.structureTemplateManager();
+            HeightLimitView heightLimitView = context.world();
+            ChunkRandom chunkRandom = context.random();
+            Registry<StructurePool> registry = dynamicRegistryManager.get(RegistryKeys.TEMPLATE_POOL);
+            BlockRotation blockRotation = BlockRotation.random(chunkRandom);
+            blockRotation = BlockRotation.NONE;
+            StructurePool structurePoolWithDefault = structurePool.getKey()
+                    .flatMap(
+                            (key) -> registry.getOrEmpty(aliasLookup.lookup(key)))
+                    .orElse(structurePool.value());
+            StructurePoolElement structurePoolElement = structurePoolWithDefault.getRandomElement(chunkRandom);
+            Vec3i offset = structurePoolElement
+                    .getBoundingBox(structureTemplateManager, new BlockPos(0, 0, 0), blockRotation)
+                    .getCenter().withY(0);
+            BlockPos blockPos2 = pos.subtract(offset);
+            PoolStructurePiece poolStructurePiece = new PoolStructurePiece(structureTemplateManager, structurePoolElement, blockPos2, structurePoolElement.getGroundLevelDelta(), blockRotation, structurePoolElement.getBoundingBox(structureTemplateManager, blockPos2, blockRotation), liquidSettings);
+            BlockBox blockBox = poolStructurePiece.getBoundingBox();
+            return Optional.of(new Structure.StructurePosition(blockPos2, (collector) -> {
+                List<PoolStructurePiece> list = Lists.newArrayList();
+                list.add(poolStructurePiece);
+                if (size > 0) {
+                    Box box = new Box(
+                            blockBox.getMinX(), blockBox.getMinY(), blockBox.getMinZ(),
+                            blockBox.getMaxX(), blockBox.getMaxY(), blockBox.getMaxZ()
+                            );
+                    VoxelShape voxelShape = VoxelShapes.combineAndSimplify(VoxelShapes.cuboid(box), VoxelShapes.cuboid(Box.from(blockBox)), BooleanBiFunction.ONLY_FIRST);
+
+                    StructurePoolBasedGenerator.generate(context.noiseConfig(), size, true, chunkGenerator, structureTemplateManager, heightLimitView, chunkRandom, registry, poolStructurePiece, list, voxelShape, aliasLookup, liquidSettings);
+
+                    Objects.requireNonNull(collector);
+                    list.forEach(collector::addPiece);
+                }
+            }));
+        }
     }
 }
