@@ -1,7 +1,10 @@
 {
   "variants": {
-    "": {
-      "model": "suspicious_lakes:block/suspicious_liquid"
-    }
+    "activated=true": {
+      "model": "suspicious_lakes:block/activated_suspicious_liquid"
+    },
+	"activated=false": {
+		"model": "suspicious_lakes:block/deactivated_suspicioius_liquid"
+	}
   }
 }

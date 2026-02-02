@@ -17,6 +17,7 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.biome.Biome;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,7 +72,8 @@ public class Enderlakes implements ModInitializer {
 	);
 
 	public static final TagKey<Fluid> SUSPICIOUS_LIQUID = TagKey.of(RegistryKeys.FLUID, Identifier.of(MOD_ID, "suspicious_liquid"));
-	public static final TagKey<EntityType<?>> TELEPORTED_BY_SUSPICIOUS_LAKE = TagKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(MOD_ID, "teleported_by_suspicious_lake"));
+    public static final TagKey<EntityType<?>> TELEPORTED_BY_SUSPICIOUS_LAKE = TagKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(MOD_ID, "teleported_by_suspicious_lake"));
+    public static final TagKey<Biome> HAS_STRUCTURE_SUSPICIOUS_LAKE = TagKey.of(RegistryKeys.BIOME, Identifier.of(MOD_ID, "has_structure/suspicious_lake"));
 
 	@Override
 	public void onInitialize() {

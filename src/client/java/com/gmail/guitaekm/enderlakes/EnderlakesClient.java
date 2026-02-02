@@ -14,10 +14,11 @@ public class EnderlakesClient implements ClientModInitializer {
 		FluidRenderHandlerRegistry.INSTANCE.register(
 				Enderlakes.SUSPICIOUS_LIQUID_STILL_FLUID,
 				Enderlakes.SUSPICIOUS_LIQUID_FLOWING_FLUID,
-				new SimpleFluidRenderHandler(
-						Identifier.of(Enderlakes.MOD_ID, "block/suspicious_liquid_still"),
-						Identifier.of(Enderlakes.MOD_ID, "block/suspicious_liquid_flow"),
-						0xFFFFFF
+				new SuspiciousFluidRenderHandler(
+						Identifier.of(Enderlakes.MOD_ID, "block/activated_suspicious_liquid_still"),
+						Identifier.of(Enderlakes.MOD_ID, "block/activated_suspicious_liquid_flow"),
+						Identifier.of(Enderlakes.MOD_ID, "block/deactivated_suspicious_liquid_still"),
+                        Identifier.of(Enderlakes.MOD_ID, "block/deactivated_suspicious_liquid_flow")
 				)
 		);
 		BlockRenderLayerMap.INSTANCE.putFluids(RenderLayer.getTranslucent(), Enderlakes.SUSPICIOUS_LIQUID_STILL_FLUID, Enderlakes.SUSPICIOUS_LIQUID_FLOWING_FLUID);
