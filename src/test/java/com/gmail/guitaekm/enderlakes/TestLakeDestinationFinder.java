@@ -4,16 +4,21 @@ import com.gmail.guitaekm.enderlakes.LakeDestinationFinder.ChunkPos;
 import com.gmail.guitaekm.enderlakes.LakeDestinationFinder.GridPos;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
+import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestLakeDestinationFinder {
+    public static final Logger LOGGER = LoggerFactory.getLogger("lake_destination_tester");
     static ConfigInstance smallPrimeConfig = new ConfigInstance(
             19,
             new ConfigValues().powerDistance,
@@ -328,6 +333,107 @@ public class TestLakeDestinationFinder {
             boolean expected = firstPrimes.contains(i);
             boolean actual = LakeDestinationFinder.isPrime(i);
             assertEquals(expected, actual);
+        }
+    }
+
+    @Test
+    public void testPiCycles() {
+        Random random = new Random(42);
+        testAbstractCycles(
+                () -> random.nextInt(1, CONFIG.nrLakes()),
+                i -> LakeDestinationFinder.pi(i, CONFIG),
+                Objects::equals
+        );
+    }
+
+    @Test
+    public void testGridTeleportAim() {
+        Random random = new Random(42);
+        for (int i = 0; i < 10; i++) {
+            int g = LakeDestinationFinder.getG(CONFIG.nrLakes(), CONFIG.factsPhi(), random.nextLong());
+            int gInv = LakeDestinationFinder.getInv(CONFIG.nrLakes(), g);
+            int boundary = LakeDestinationFinder.fInv(CONFIG, (int)(Math.sqrt(CONFIG.nrLakes()) + 0.5));
+            testAbstractCycles(
+                    () -> {
+                        int coord1 = random.nextInt(-boundary, boundary);
+                        int coord2 = random.nextInt(1, boundary);
+                        if (random.nextBoolean()) {
+                            coord2 = -coord2;
+                        }
+                        int x, z;
+                        if (random.nextBoolean()) {
+                            x = coord1;
+                            z = coord2;
+                        } else {
+                            x = coord2;
+                            z = coord1;
+                        }
+                        return new GridPos(x, z);
+                    },
+                    oldPos -> LakeDestinationFinder.teleportAim(
+                            CONFIG,
+                            oldPos,
+                            g,
+                            gInv
+                    ),
+                    (pos1, pos2) -> pos1.x() == pos2.x() && pos1.y() == pos2.y()
+            );
+        }
+    }
+
+    public <T> void testAbstractCycles(
+            Supplier<T> startElements,
+            UnaryOperator<T> advancer,
+            BiFunction<T, T, Boolean> isEqual
+    ) {
+        // records don't have a proper hashCode
+        // methods therefore a Set can't be used
+        List<T> previousElements = new ArrayList<>();
+        T currentElement = startElements.get();
+        for (int i = 0; i < 100; i++) {
+            List<T> otherElements = previousElements.size() >= 2
+                    ? previousElements.subList(1, previousElements.size())
+                    : List.of();
+            for (T previousElement : otherElements) {
+                if (isEqual.apply(currentElement, previousElement)) {
+                    LOGGER.error(
+                            "{} is equal to {} but should instead be equal to {}",
+                            currentElement,
+                            previousElement,
+                            previousElements.getFirst()
+                    );
+                    assert false;
+                }
+            }
+            if (!previousElements.isEmpty() && isEqual.apply(currentElement, previousElements.getFirst())) {
+                previousElements.clear();
+                currentElement = startElements.get();
+            }
+            if (previousElements.size() > CONFIG.cycleWeights().size()) {
+                LOGGER.error(String.valueOf(previousElements));
+                assert false;
+            }
+            previousElements.add(currentElement);
+            currentElement = advancer.apply(currentElement);
+
+        }
+    }
+    @Test
+    public void testGInv() {
+        Random random = new Random(42);
+        for (int i = 0; i < 1_000; i++) {
+            int N = random.nextInt(2, 10_000);
+            while (!LakeDestinationFinder.isPrime(N)) {
+                N++;
+            }
+            int[] phiFacts = LakeDestinationFinder
+                    .primeFactors(N - 1)
+                    .stream()
+                    .mapToInt(fact -> fact)
+                    .toArray();
+            int g = LakeDestinationFinder.getG(N, phiFacts, random.nextLong());
+            int gInv = LakeDestinationFinder.getInv(N, g);
+            assert LakeDestinationFinder.modularMultiplicationByDoubling(g, gInv, N) == 1;
         }
     }
 }

@@ -1,18 +1,12 @@
 package com.gmail.guitaekm.enderlakes;
 
 import com.google.common.collect.Streams;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import net.minecraft.util.math.random.LocalRandom;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.world.gen.structure.Structure;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiFunction;
-import java.util.function.BinaryOperator;
 import java.util.function.Function;
-import java.util.function.UnaryOperator;
 
 /**
  * Follows math.md to implement the logic in this mod
@@ -86,9 +80,7 @@ public class LakeDestinationFinder {
             case 1 -> new GridPos(-y, +x);
             case 2 -> new GridPos(-x, -y);
             case 3 -> new GridPos(+y, -x);
-            default -> {
-                throw new IllegalStateException("Rotating should be one of 0, 1, 2, 3. Inform the developer of this mod.");
-            }
+            default -> throw new IllegalStateException("Rotating should be one of 0, 1, 2, 3. Inform the developer of this mod.");
         };
     }
 
@@ -131,8 +123,8 @@ public class LakeDestinationFinder {
         int res = (s + 1) * s / 2 - y - 1;
         return res * 4 + rotation + 1;
     }
-    public static int cInv(GridPos outp) {
-        return cInv(outp.x, outp.y);
+    public static int cInv(GridPos output) {
+        return cInv(output.x, output.y);
     }
     public static int f(ConfigInstance config, int c) {
         int signum = Integer.compare(c, 0);
@@ -140,7 +132,7 @@ public class LakeDestinationFinder {
     }
     public static int fInv(ConfigInstance config, int c) {
         int signum = Integer.compare(c, 0);
-        return signum * (int) (Math.round(Math.pow((double) Math.abs(c) / config.minimumDistance(), 1d / (double) config.powerDistance())));
+        return signum * (int) (Math.round(Math.pow((double) Math.abs(c) / config.minimumDistance(), 1d / config.powerDistance())));
     }
 
     /**
@@ -375,6 +367,7 @@ public class LakeDestinationFinder {
     // from https://stackoverflow.com/a/6233030/3289974
     public static ArrayList<Integer> primeFactors(int num)
     {
+        assert num > 1;
         assert num < 300_000_000;
         ArrayList<Integer> factors = new ArrayList<>();
         for (int a = 2;  num>1; ) {
@@ -391,24 +384,71 @@ public class LakeDestinationFinder {
     }
 
     public static boolean isPrime(int n) {
+        if (n < 2) {
+            return false;
+        }
         return primeFactors(n).size() == 1;
     }
 
-    public static ChunkPos teleportAim(
+    public static GridPos teleportAim(
             ConfigInstance config,
-            ChunkPos oldPos,
-            Random minecraftRandom,
+            GridPos oldPos,
             int g,
-            int gInv,
-            int seed
+            int gInv
+    ) {
+        assert modularMultiplicationByDoubling(g, gInv, config.nrLakes()) == 1;
+        int number = modularMultiplicationByDoubling(g, cInv(oldPos), config.nrLakes());
+        int mappedNumber = modularMultiplicationByDoubling(gInv, pi(number, config), config.nrLakes());
+        return c(mappedNumber);
+    }
+    public static ChunkPos teleportAim(
+                ConfigInstance config,
+                ChunkPos oldPos,
+                Random minecraftRandom,
+                int g,
+                int gInv,
+                long seed
     ) {
         assert isPrimitiveRootFast(g, config.nrLakes(), config.factsPhi());
         Set<GridPos> gridPositions = LakeDestinationFinder.findNearestLake(config, seed, oldPos);
         GridPos gridPos = new ArrayList<>(gridPositions).get(
                 (int)(gridPositions.size() * minecraftRandom.nextDouble())
         );
-        //cInv(gridPos)
-        // todo: finish
-        return oldPos;
+        return pos(config, seed, teleportAim(config, gridPos, g, gInv));
+    }
+
+    public static int getG(int N, int[] factsPhi, long seed) {
+        Random random = new LocalRandom(seed);
+        int g = random.nextBetween(1, N - 1);
+        while (isPrimitiveRootFast(g, N, factsPhi)) {
+            g = random.nextBetween(1, N - 1);
+        }
+        return g;
+    }
+
+    public static int getInv(int N, int g) {
+        int a = g;
+        int b = N;
+        // extended euclidean algorithm from https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm
+        int oldR = a, r = b;
+        int oldS = 1, s = 0;
+        int oldT = 0, t = 1;
+        while (r != 0) {
+            int quotient = oldR / r;
+
+            int tempR = r;
+            r = oldR - quotient * r;
+            oldR = tempR;
+
+            int tempS = s;
+            s = oldS - quotient * s;
+            oldS = tempS;
+
+            int tempT = t;
+            t = oldT - quotient * t;
+            oldT = tempT;
+        }
+        // oldS can be negative
+        return (oldS + N) % N;
     }
 }
