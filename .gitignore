@@ -39,4 +39,6 @@ replay_*.log
 *.hprof
 *.jfr
 
+# my own list
 .profileconfig.json
+logs/
