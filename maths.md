@@ -1,11 +1,12 @@
 ## Translation of config to math variables
 
-| ModMenu | config          | this document |
-| ------- | --------------- | ------------- |
-|         | nrLakes         | n             |
-|         | powerDistance   | e             |
-|         | cycleWeights    | *             |
-|         | minimumDistance | d             |
+| ModMenu | config          | this document                      |
+| ------- | --------------- | ---------------------------------- |
+|         | nrLakes         | n                                  |
+|         | powerDistance   | e                                  |
+|         | cycleWeights    | *                                  |
+|         | minimumDistance | d                                  |
+|         | factsPhi        | list of factors of $\phi(n)=n - 1$ |
 
 
 *) cycleWeights define weights for the length of each cycle, that means the first entry is the weight of the 1-cycle, the second entry is the weight of the 2-cycle and so on
