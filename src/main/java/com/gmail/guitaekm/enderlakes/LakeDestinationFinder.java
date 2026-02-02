@@ -393,4 +393,22 @@ public class LakeDestinationFinder {
     public static boolean isPrime(int n) {
         return primeFactors(n).size() == 1;
     }
+
+    public static ChunkPos teleportAim(
+            ConfigInstance config,
+            ChunkPos oldPos,
+            Random minecraftRandom,
+            int g,
+            int gInv,
+            int seed
+    ) {
+        assert isPrimitiveRootFast(g, config.nrLakes(), config.factsPhi());
+        Set<GridPos> gridPositions = LakeDestinationFinder.findNearestLake(config, seed, oldPos);
+        GridPos gridPos = new ArrayList<>(gridPositions).get(
+                (int)(gridPositions.size() * minecraftRandom.nextDouble())
+        );
+        //cInv(gridPos)
+        // todo: finish
+        return oldPos;
+    }
 }
