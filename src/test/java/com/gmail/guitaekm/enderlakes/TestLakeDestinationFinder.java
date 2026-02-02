@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -225,18 +227,42 @@ public class TestLakeDestinationFinder {
 
     @Test
     public void testModularExponentiationBySquaring() {
+        testModularMultiplicationAndExponentiation(
+                LakeDestinationFinder::modularExponentiationBySquaring,
+                (a, b) -> (int)(Math.round(Math.pow(a, b))),
+                Math::pow
+        );
+    }
+
+    @Test void testModularMultiplicationByDoubling() {
+        testModularMultiplicationAndExponentiation(
+                LakeDestinationFinder::modularMultiplicationByDoubling,
+                (a, b) -> a * b,
+                (a, b) -> a * b
+        );
+    }
+
+    public interface TernaryOperator<T> {
+        T apply(T a, T b, T c);
+    }
+
+    public void testModularMultiplicationAndExponentiation(
+            TernaryOperator<Integer> testedOperation,
+            BinaryOperator<Integer> overflowUnsafeOperation,
+            BinaryOperator<Double> unpreciseOperation
+            ) {
         Random random = new Random(42);
         int counter = 0;
         for (int i = 0; i < 10000; i++) {
             int b = random.nextInt(-20, 20);
             int e = random.nextInt(2, 8);
-            if (Math.pow(b, e) >= Integer.MAX_VALUE) {
+            if (unpreciseOperation.apply((double)b, (double)e) >= Integer.MAX_VALUE) {
                 continue;
             }
             counter++;
             int n = random.nextInt(Math.abs(b) + 1, 100);
-            int expected = (int) Math.round((Math.pow(b, e) % n + n) % n);
-            long actual = LakeDestinationFinder.modularExponentiationBySquaring(b, e, n);
+            int expected = (overflowUnsafeOperation.apply(b, e) % n + n) % n;
+            long actual = testedOperation.apply(b, e, n);
             assertEquals(expected, actual);
         }
         assert counter >= 1000;
@@ -257,7 +283,7 @@ public class TestLakeDestinationFinder {
     @Test
     public void testIsPrimitiveRoot() {
         Random random = new Random(42);
-        // no that the prime number is so big, this code isn't possible to be run through because the
+        // now that the prime number is so big, this code isn't possible to be run through because the
         // memory that isPrimitiveRootSlow needs is so inefficient (it was optimized to be mathematically
         // exact, not fast or memory efficient)
         /*
@@ -284,7 +310,7 @@ public class TestLakeDestinationFinder {
         assert LakeDestinationFinder.isPrime(n);
         Set<Integer> result = new HashSet<>();
         for (int i = 0; i < n; i++) {
-            result.add((int) LakeDestinationFinder.modularExponentiationBySquaring(g, i, n));
+            result.add(LakeDestinationFinder.modularExponentiationBySquaring(g, i, n));
         }
         return result.size() == n - 1;
     }

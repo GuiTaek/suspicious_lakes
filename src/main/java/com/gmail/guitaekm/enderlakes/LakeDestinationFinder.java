@@ -1,12 +1,18 @@
 package com.gmail.guitaekm.enderlakes;
 
 import com.google.common.collect.Streams;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.util.math.random.Random;
+import net.minecraft.world.gen.structure.Structure;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 /**
  * Follows math.md to implement the logic in this mod
@@ -285,21 +291,60 @@ public class LakeDestinationFinder {
 
     }
 
-    // from https://en.wikipedia.org/wiki/Modular_exponentiation#Pseudocode
-    public static long modularExponentiationBySquaring(long b, long e, long n) {
+    /** implements <a href="https://en.wikipedia.org/wiki/Modular_exponentiation#Pseudocode">modular exponentation</a>
+     * but with lambdas so you can use it for multiplication
+     *
+     * @return result of multiplication/exponentation
+     */
+    private static int modularMultExpHelper(
+            int b,
+            int e,
+            int n,
+            Function<Integer, Long> squareOperation,
+            BiFunction<Integer, Integer, Long> multiplyOperation,
+            int neutralElement
+    ) {
         if (n == 1) {
             return 0;
         }
-        long result = 1;
+        int result = neutralElement;
         b = b % n;
         while (e > 0) {
             if (e % 2 == 1) {
-                result = ((result * b) % n + n) % n;
+                // conversion allowed because of % n and n is int
+                result = (int)((multiplyOperation.apply(result, b) % n + n) % n);
             }
             e = e >> 1;
-            b = ((b * b) % n + n) % n;
+            // conversion allowed because of % n and n is int
+            b = (int)((squareOperation.apply(b) % n + n) % n);
         }
         return (result % n + n) % n;
+    }
+
+    /**
+     * fast modular Multiplication. Inspired by <a href="https://stackoverflow.com/a/20677244/3289974">this post</a>
+     * also keep my comment in mind
+     * @param a a factor
+     * @param b a factor
+     * @param N the divisor
+     * @return (a * b) % N
+     */
+    public static int modularMultiplicationByDoubling(int a, int b, int N) {
+        return modularMultExpHelper(
+                a, b, N,
+                b_ -> 2 * (long)b_,
+                (a_, b_) -> (long)a_ + (long)b_,
+                0
+        );
+    }
+
+    public static int modularExponentiationBySquaring(int b, int e, int N) {
+        return modularMultExpHelper(
+                b, e, N,
+                b_ -> (long)b_ * (long)b_,
+                (a_, b_) -> (long)a_ * (long)b_,
+                1
+        );
     }
 
     // not used
