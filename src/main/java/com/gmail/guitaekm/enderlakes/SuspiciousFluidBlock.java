@@ -5,21 +5,21 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.registry.tag.FluidTags;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.function.BooleanBiFunction;
+import net.minecraft.util.math.*;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.*;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 
-class SuspiciousFluidBlock extends FluidBlock {
+import java.util.Set;
+
+public class SuspiciousFluidBlock extends FluidBlock {
     public static final BooleanProperty ACTIVATED = BooleanProperty.of("activated");
 
     public SuspiciousFluidBlock(FlowableFluid fluid, Settings settings) {
@@ -65,31 +65,83 @@ class SuspiciousFluidBlock extends FluidBlock {
 
     @Override
     protected VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        VoxelShape collisionShape = getFluidState(state).getShape(world, pos);
         if (!state.get(ACTIVATED)) {
-            return getFluidState(state).getShape(world, pos);
+            return collisionShape;
         }
         if (context instanceof EntityShapeContext entityShapeContext) {
-            Entity contextEntity = entityShapeContext.getEntity();
-            Vec3d targetPosition = new Vec3d(0.0, 128.0, 0.0);
-            if (contextEntity == null) {
-                return getFluidState(state).getShape(world, pos);
+            Entity entity = entityShapeContext.getEntity();
+            if (entity == null) {
+                return collisionShape;
             }
-            if (contextEntity.getType().isIn(Enderlakes.TELEPORTED_BY_SUSPICIOUS_LAKE)) {
-                contextEntity.speed = 0;
-                contextEntity.refreshPositionAndAngles(targetPosition, 0.0f, 0.0f);
-                if (contextEntity instanceof EnderPearlEntity enderPearl) {
-                    if (enderPearl.getWorld() instanceof ServerWorld serverWorld) {
-                        Entity owner = enderPearl.getOwner();
-                        if (owner == null) {
-                            return getFluidState(state).getShape(world, pos);
-                        }
-                        owner.teleportTo(new TeleportTarget(serverWorld, targetPosition, new Vec3d(0, 0, 0), owner.getYaw(), owner.getPitch(), TeleportTarget.NO_OP));
-                        enderPearl.kill();
-                    }
+            if (entity.getType().isIn(Enderlakes.PERMEABLE_BY_SUSPICIOUS_FLUID)) {
+                Box shrunkenRawShape = collisionShape
+                        .getBoundingBox().contract(0.01);
+                if (!(world instanceof ServerWorld serverWorld)) {
+                    return collisionShape;
                 }
+                this.testTeleport(state, serverWorld, pos, entity);
+                return VoxelShapes.cuboid(shrunkenRawShape);
             }
         }
-        return getFluidState(state).getShape(world, pos);
+        return collisionShape;
+    }
+
+    public boolean shouldTeleport(Entity entity, BlockState state, BlockPos pos) {
+        if (entity.getWorld().isClient) {
+            return false;
+        }
+        if (!state.getBlock().equals(this)) {
+            return false;
+        }
+        if (!state.get(ACTIVATED)) {
+            return false;
+        }
+        VoxelShape centeredCollisionShape = getFluidState(state)
+                .getShape(entity.getWorld(), pos);
+        VoxelShape movedCollisionShape = centeredCollisionShape
+                .offset(pos.getX(), pos.getY(), pos.getZ());
+
+        Box boundingBox = entity.calculateBoundingBox();
+        if (entity.getType().isIn(Enderlakes.PERMEABLE_BY_SUSPICIOUS_FLUID)) {
+            // the stretch is because minecraft predicts collision before actually moving, and this is how it does that
+            // and because the ender pearl vanishes on collision, we have to mimic the code
+            boundingBox = boundingBox.stretch(entity.getVelocity());
+        }
+
+        return VoxelShapes.matchesAnywhere(
+                movedCollisionShape,
+                VoxelShapes.cuboid(boundingBox),
+                BooleanBiFunction.AND
+        );
+    }
+
+    public void teleport(World world, Entity entity, BlockPos fromPos) {
+        Vec3d targetPosition = new Vec3d(0.0, 128.0, 0.0);
+        entity.speed = 0;
+        entity.teleport((ServerWorld)world, targetPosition.x, targetPosition.y, targetPosition.z, Set.of(), 0, 0);
+        if (entity instanceof EnderPearlEntity enderPearl) {
+            if (enderPearl.getWorld() instanceof ServerWorld serverWorld) {
+                Entity owner = enderPearl.getOwner();
+                if (owner == null) {
+                    return;
+                }
+                owner.teleportTo(new TeleportTarget(serverWorld, targetPosition, new Vec3d(0, 0, 0), owner.getYaw(), owner.getPitch(), TeleportTarget.NO_OP));
+                enderPearl.kill();
+            }
+        }
+    }
+
+    public void testTeleport(BlockState state, World world, BlockPos pos, Entity entity) {
+        if (!this.shouldTeleport(entity, state, pos)) {
+            return;
+        }
+        teleport(world, entity, pos);
+    }
+
+    @Override
+    protected void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+        testTeleport(state, world, pos, entity);
     }
 
     @Override

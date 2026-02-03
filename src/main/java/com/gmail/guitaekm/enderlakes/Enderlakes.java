@@ -3,6 +3,7 @@ package com.gmail.guitaekm.enderlakes;
 import com.gmail.guitaekm.enderlakes.lakes.Structures;
 import net.fabricmc.api.ModInitializer;
 
+import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.block.*;
 import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.entity.EntityType;
@@ -40,7 +41,7 @@ public class Enderlakes implements ModInitializer {
 			new SuspiciousFluid.Flowing()
 	);
 
-	public static final Block SUSPICIOUS_LIQUID_BLOCK = Registry.register(
+	public static final SuspiciousFluidBlock SUSPICIOUS_LIQUID_BLOCK = Registry.register(
 			Registries.BLOCK,
 			Identifier.of(MOD_ID, "suspicious_liquid"),
 			new SuspiciousFluidBlock(
@@ -57,10 +58,6 @@ public class Enderlakes implements ModInitializer {
 							.sounds(BlockSoundGroup.AMETHYST_BLOCK)
 							.dynamicBounds()
 			));
-			//(String)"water", new FluidBlock(Fluids.WATER,
-			// AbstractBlock.Settings.create().mapColor(MapColor.WATER_BLUE).replaceable()
-			// .noCollision().strength(100.0F).pistonBehavior(PistonBehavior.DESTROY).dropsNothing()
-			// .liquid().sounds(BlockSoundGroup.INTENTIONALLY_EMPTY)));
 
 	public static final Item SUSPICIOUS_BUCKET = Registry.register(
 			Registries.ITEM,
@@ -72,7 +69,7 @@ public class Enderlakes implements ModInitializer {
 	);
 
 	public static final TagKey<Fluid> SUSPICIOUS_LIQUID = TagKey.of(RegistryKeys.FLUID, Identifier.of(MOD_ID, "suspicious_liquid"));
-    public static final TagKey<EntityType<?>> TELEPORTED_BY_SUSPICIOUS_LAKE = TagKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(MOD_ID, "teleported_by_suspicious_lake"));
+    public static final TagKey<EntityType<?>> PERMEABLE_BY_SUSPICIOUS_FLUID = TagKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(MOD_ID, "permeable_by_suspicious_fluid"));
     public static final TagKey<Biome> HAS_STRUCTURE_SUSPICIOUS_LAKE = TagKey.of(RegistryKeys.BIOME, Identifier.of(MOD_ID, "has_structure/suspicious_lake"));
 
 	@Override
