@@ -1,10 +1,10 @@
 package com.gmail.guitaekm.enderlakes.mixin;
 
+/// suggested by ChatGPT in case ender pearl breaks some of its cautious pearl broken tests
+/// not necessary for 1.21 but because ender pearls did change in later versions a lot will keep it
+
 import com.gmail.guitaekm.enderlakes.Enderlakes;
-import com.gmail.guitaekm.enderlakes.SuspiciousFluid;
-import com.gmail.guitaekm.enderlakes.SuspiciousFluidBlock;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.entity.projectile.thrown.ThrownItemEntity;
