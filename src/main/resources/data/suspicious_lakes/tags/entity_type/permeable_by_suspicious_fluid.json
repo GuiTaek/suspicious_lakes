@@ -1,7 +1,6 @@
 {
   "replace": false,
   "values": [
-    "minecraft:ender_pearl",
-    "minecraft:pig"
+    "minecraft:ender_pearl"
   ]
 }
