@@ -114,10 +114,40 @@ public class TestLakeDestinationFinder {
 
     @Test
     public void cInvInvOfC() {
-        for (int i = 1; i < 1000; i++) {
+        for (int i = 1; i < 10_000; i++) {
             assertEquals(i, LakeDestinationFinder.cInv(
                     LakeDestinationFinder.c(i)
             ));
+        }
+    }
+
+    @Test
+    public void testCSurjective() {
+        int RADIUS = 10;
+        int DIAMETER = 2 * RADIUS + 1;
+        boolean[][] gridFlags = new boolean[DIAMETER][DIAMETER];
+        for (int i = 1; i <= DIAMETER * DIAMETER; i++) {
+            GridPos pos = LakeDestinationFinder.c(i);
+            int offX = pos.x() + RADIUS;
+            int offY = pos.y() + RADIUS;
+            assert offX <= DIAMETER;
+            assert offY <= DIAMETER;
+            gridFlags[offX][offY] = true;
+        }
+        assert !gridFlags[RADIUS + 1][RADIUS + 1];
+        for (int offX = 0; offX <= DIAMETER; offX++) {
+            if (offX != RADIUS + 1) {
+                for (int offY = 0; offY <= DIAMETER; offY++) {
+                    assert gridFlags[offX][offY];
+                }
+                continue;
+            }
+            for (int offY = 0; offY <= RADIUS; offY++) {
+                assert gridFlags[offX][offY];
+            }
+            for (int offY = RADIUS + 2; offY <= DIAMETER; offY++) {
+                assert gridFlags[offX][offY];
+            }
         }
     }
 
