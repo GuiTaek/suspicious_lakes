@@ -32,10 +32,14 @@ public abstract class EnderPearlEntityMixin extends ThrownItemEntity {
         World world = this.getWorld();
         BlockPos pos = blockHit.getBlockPos();
         BlockState state = world.getBlockState(pos);
-        if (Enderlakes.SUSPICIOUS_LIQUID_BLOCK.shouldTeleport(this, state, pos)) {
-            Enderlakes.SUSPICIOUS_LIQUID_BLOCK.teleport(this.getWorld(), this, pos);
-            // ChatGPT suggested it in order to be future-compatible
-            ci.cancel();
+        if (!Enderlakes.SUSPICIOUS_LIQUID_BLOCK.shouldTeleport(this, state, pos)) {
+            return;
         }
+        boolean success = Enderlakes.SUSPICIOUS_LIQUID_BLOCK.teleport(this.getWorld(), this, pos);
+        if (!success) {
+            return;
+        }
+        // ChatGPT suggested it in order to be future-compatible
+        ci.cancel();
     }
 }

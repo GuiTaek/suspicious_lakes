@@ -419,7 +419,40 @@ public class LakeDestinationFinder {
         return pos(config, seed, teleportAim(config, gridPos, g, gInv));
     }
 
+    public static ChunkPos safeTeleportAim(
+            World world,
+            ConfigInstance config,
+            ChunkPos oldPos,
+            Random minecraftRandom,
+            int g,
+            int gInv,
+            long seed
+    ) {
+        ChunkPos currPos = oldPos;
+        int counter = 0;
+        do {
+            currPos = teleportAim(config, currPos, minecraftRandom, g, gInv, seed);
+            if (counter > config.cycleWeights().size()) {
+                // some fail-safe if someone enters a lake outside the border and none of the cycle is within
+                return null;
+            }
+            counter++;
+        } while (!world.getWorldBorder().contains(currPos.getBlockPos(8, 0, 8)));
+        return currPos;
+    }
+
+    private static int g;
+    private static Long lastSeed = null;
+
     public static int getG(int N, int[] factsPhi, long seed) {
+        if (!Objects.equals(seed, lastSeed)) {
+            LakeDestinationFinder.g = calculateG(N, factsPhi, seed);
+            LakeDestinationFinder.lastSeed = seed;
+        }
+        return LakeDestinationFinder.g;
+    }
+
+    public static int calculateG(int N, int[] factsPhi, long seed) {
         Random random = new LocalRandom(seed);
         int g = random.nextBetween(1, N - 1);
         while (isPrimitiveRootFast(g, N, factsPhi)) {
@@ -428,7 +461,7 @@ public class LakeDestinationFinder {
         return g;
     }
 
-    public static int getInv(int N, int g) {
+    public static int calculateInv(int N, int g) {
         int a = g;
         int b = N;
         // extended euclidean algorithm from https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm
@@ -452,5 +485,16 @@ public class LakeDestinationFinder {
         }
         // oldS can be negative
         return (oldS + N) % N;
+    }
+
+    private static Integer lastG = null;
+    private static int gInv;
+
+    public static int getInv(int N, int g) {
+        if (!Objects.equals(g, lastG)) {
+            gInv = calculateInv(N, g);
+            lastG = g;
+        }
+        return LakeDestinationFinder.gInv;
     }
 }

@@ -266,7 +266,7 @@ public class TestLakeDestinationFinder {
                 continue;
             }
             counter++;
-            int n = random.nextInt(Math.abs(b) + 1, 100);
+            int n = random.nextInt(Math.max(Math.abs(b) + 1, 2), 100);
             int expected = (overflowUnsafeOperation.apply(b, e) % n + n) % n;
             long actual = testedOperation.apply(b, e, n);
             assertEquals(expected, actual);
@@ -351,8 +351,8 @@ public class TestLakeDestinationFinder {
     public void testGridTeleportAim() {
         Random random = new Random(42);
         for (int i = 0; i < 10; i++) {
-            int g = LakeDestinationFinder.getG(CONFIG.nrLakes(), CONFIG.factsPhi(), random.nextLong());
-            int gInv = LakeDestinationFinder.getInv(CONFIG.nrLakes(), g);
+            int g = LakeDestinationFinder.calculateG(CONFIG.nrLakes(), CONFIG.factsPhi(), random.nextLong());
+            int gInv = LakeDestinationFinder.calculateInv(CONFIG.nrLakes(), g);
             int boundary = LakeDestinationFinder.fInv(CONFIG, (int)(Math.sqrt(CONFIG.nrLakes()) + 0.5));
             testAbstractCycles(
                     () -> {
@@ -432,8 +432,8 @@ public class TestLakeDestinationFinder {
                     .stream()
                     .mapToInt(fact -> fact)
                     .toArray();
-            int g = LakeDestinationFinder.getG(N, phiFacts, random.nextLong());
-            int gInv = LakeDestinationFinder.getInv(N, g);
+            int g = LakeDestinationFinder.calculateG(N, phiFacts, random.nextLong());
+            int gInv = LakeDestinationFinder.calculateInv(N, g);
             assert LakeDestinationFinder.modularMultiplicationByDoubling(g, gInv, N) == 1;
         }
     }

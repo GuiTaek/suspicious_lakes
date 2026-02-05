@@ -12,11 +12,9 @@ import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.*;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.TeleportTarget;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.world.*;
 
+import java.util.Objects;
 import java.util.Set;
 
 public class SuspiciousFluidBlock extends FluidBlock {
@@ -116,20 +114,36 @@ public class SuspiciousFluidBlock extends FluidBlock {
         );
     }
 
-    public void teleport(World world, Entity entity, BlockPos fromPos) {
-        Vec3d targetPosition = new Vec3d(0.0, 128.0, 0.0);
+    public boolean teleport(World world, Entity entity, BlockPos fromPos) {
+        long seed = Objects.requireNonNull(world.getServer()).getOverworld().getSeed();
+        int g = LakeDestinationFinder.getG(
+                Enderlakes.CONFIG.nrLakes(),
+                Enderlakes.CONFIG.factsPhi(),
+                seed
+        );
+        int gInv = LakeDestinationFinder.getInv(Enderlakes.CONFIG.nrLakes(), g);
+        // todo: check if random is seed dependent
+        ChunkPos destChunk = LakeDestinationFinder.safeTeleportAim(world, Enderlakes.CONFIG, new ChunkPos(fromPos), world.getRandom(), g, gInv, seed);
+        if (destChunk == null) {
+            return false;
+        }
+        BlockPos toPosRaw = destChunk.getBlockPos(8, 0, 8);
+        int toY = world.getTopY(Heightmap.Type.WORLD_SURFACE, toPosRaw.getX(), toPosRaw.getZ());
+        BlockPos toPos = toPosRaw.withY(toY);
+        Vec3d targetPosition = new Vec3d(toPos.getX() + 0.5, toPos.getY(), toPos.getZ() + 0.5);
         entity.speed = 0;
         entity.teleport((ServerWorld)world, targetPosition.x, targetPosition.y, targetPosition.z, Set.of(), 0, 0);
         if (entity instanceof EnderPearlEntity enderPearl) {
             if (enderPearl.getWorld() instanceof ServerWorld serverWorld) {
                 Entity owner = enderPearl.getOwner();
                 if (owner == null) {
-                    return;
+                    return false;
                 }
                 owner.teleportTo(new TeleportTarget(serverWorld, targetPosition, new Vec3d(0, 0, 0), owner.getYaw(), owner.getPitch(), TeleportTarget.NO_OP));
                 enderPearl.kill();
             }
         }
+        return true;
     }
 
     public void testTeleport(BlockState state, World world, BlockPos pos, Entity entity) {
@@ -141,7 +155,7 @@ public class SuspiciousFluidBlock extends FluidBlock {
 
     @Override
     protected void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
-        testTeleport(state, world, pos, entity);
+        this.testTeleport(state, world, pos, entity);
     }
 
     @Override
