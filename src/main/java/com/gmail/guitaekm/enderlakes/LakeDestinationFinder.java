@@ -45,19 +45,6 @@ public class LakeDestinationFinder {
         throw new IllegalArgumentException("integer not part of the permutation");
     }
 
-    // it is difficult to include minecraft's ChunkPos into the test module, I wasn't able to
-    /*
-    public record ChunkPos(int x, int z) {
-        public net.minecraft.util.math.ChunkPos toMinecraft() {
-            return new net.minecraft.util.math.ChunkPos(x, z);
-        }
-        public ChunkPos(net.minecraft.util.math.ChunkPos pos) {
-            this(pos.x, pos.z);
-        }
-    }
-
-     */
-
     public record GridPos(int x, int y) { }
 
     public static GridPos c(int i) {
