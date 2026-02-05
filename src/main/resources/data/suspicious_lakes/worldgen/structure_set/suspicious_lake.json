@@ -6,7 +6,6 @@
       }
     ],
 	"placement": {
-		"type": "suspicious_lakes:suspicious_lake_placement",
-		"salt": 478392748
+		"type": "suspicious_lakes:suspicious_lake_placement"
 	}
 }
