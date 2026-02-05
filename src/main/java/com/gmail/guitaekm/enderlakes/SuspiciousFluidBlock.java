@@ -13,6 +13,7 @@ import net.minecraft.util.math.*;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.*;
 import net.minecraft.world.*;
+import net.minecraft.world.chunk.ChunkStatus;
 
 import java.util.Objects;
 import java.util.Set;
@@ -85,6 +86,9 @@ public class SuspiciousFluidBlock extends FluidBlock {
         return collisionShape;
     }
 
+    // the method name would get weird if it is inverted. something like shouldntTeleport
+    // or inhibitTeleport
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean shouldTeleport(Entity entity, BlockState state, BlockPos pos) {
         if (entity.getWorld().isClient) {
             return false;
@@ -128,20 +132,50 @@ public class SuspiciousFluidBlock extends FluidBlock {
             return false;
         }
         BlockPos toPosRaw = destChunk.getBlockPos(8, 0, 8);
-        int toY = world.getTopY(Heightmap.Type.WORLD_SURFACE, toPosRaw.getX(), toPosRaw.getZ());
+        if (!(world instanceof ServerWorld serverWorld)) {
+            throw new IllegalStateException("this code shouldn't run client-side");
+        }
+        // the reason this is so weird and difficult is, that the chunk is not loaded and maybe not even generated
+        // DataFlowIssue isn't a problem because we set "create" to true
+        @SuppressWarnings("DataFlowIssue") int lakeTopLayer = serverWorld
+                .getChunkManager()
+                .getChunk(
+                        destChunk.x,
+                        destChunk.z,
+                        ChunkStatus.STRUCTURE_REFERENCES,
+                        true
+                ).sampleHeightmap(
+                        Heightmap.Type.WORLD_SURFACE,
+                        toPosRaw.getX(),
+                        toPosRaw.getZ()
+                );
+        int toY = lakeTopLayer + 1;
         BlockPos toPos = toPosRaw.withY(toY);
         Vec3d targetPosition = new Vec3d(toPos.getX() + 0.5, toPos.getY(), toPos.getZ() + 0.5);
         entity.speed = 0;
-        entity.teleport((ServerWorld)world, targetPosition.x, targetPosition.y, targetPosition.z, Set.of(), 0, 0);
+        entity.teleport(
+                serverWorld,
+                targetPosition.x,
+                targetPosition.y,
+                targetPosition.z,
+                Set.of(),
+                entity.getYaw(),
+                entity.getPitch()
+        );
         if (entity instanceof EnderPearlEntity enderPearl) {
-            if (enderPearl.getWorld() instanceof ServerWorld serverWorld) {
-                Entity owner = enderPearl.getOwner();
-                if (owner == null) {
-                    return false;
-                }
-                owner.teleportTo(new TeleportTarget(serverWorld, targetPosition, new Vec3d(0, 0, 0), owner.getYaw(), owner.getPitch(), TeleportTarget.NO_OP));
-                enderPearl.kill();
+            Entity owner = enderPearl.getOwner();
+            if (owner == null) {
+                return false;
             }
+            owner.teleportTo(new TeleportTarget(
+                    serverWorld,
+                    targetPosition,
+                    new Vec3d(0, 0, 0),
+                    owner.getYaw(),
+                    owner.getPitch(),
+                    TeleportTarget.NO_OP
+            ));
+            enderPearl.kill();
         }
         return true;
     }
