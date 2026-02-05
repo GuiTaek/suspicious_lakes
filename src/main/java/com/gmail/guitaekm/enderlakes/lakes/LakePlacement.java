@@ -2,29 +2,38 @@ package com.gmail.guitaekm.enderlakes.lakes;
 
 import com.gmail.guitaekm.enderlakes.Enderlakes;
 import com.gmail.guitaekm.enderlakes.LakeDestinationFinder;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.datafixers.util.Unit;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.util.dynamic.Codecs;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.gen.chunk.placement.*;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 
 public class LakePlacement extends RandomSpreadStructurePlacement {
 
-    public static final MapCodec<LakePlacement> CODEC = RecordCodecBuilder.mapCodec(
-            (instance) -> instance.group(
-            Codecs
-                    .NONNEGATIVE_INT
-                    .fieldOf("salt")
-                    .forGetter(LakePlacement::getSalt)
+    public static final MapCodec<LakePlacement> CODEC = Codec.EMPTY.xmap(
+            unit -> new LakePlacement(),
+            lakePlacement -> Unit.INSTANCE
+    );
 
-    ).apply(instance, instance.stable(LakePlacement::new)));
-
-    public LakePlacement(int salt) {
-        super(new Vec3i(0, 0, 0), StructurePlacement.FrequencyReductionMethod.DEFAULT, 1.0f, salt, Optional.empty(), 1, 0, SpreadType.LINEAR);
+    public LakePlacement() {
+        super(
+                new Vec3i(0, 0, 0),
+                StructurePlacement.FrequencyReductionMethod.DEFAULT,
+                1.0f,
+                0,
+                Optional.empty(),
+                1,
+                0,
+                SpreadType.LINEAR
+        );
     }
 
     @Override
