@@ -1,6 +1,5 @@
 package com.gmail.guitaekm.enderlakes;
 
-import com.gmail.guitaekm.enderlakes.LakeDestinationFinder.ChunkPos;
 import com.gmail.guitaekm.enderlakes.LakeDestinationFinder.GridPos;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -14,6 +13,8 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import net.minecraft.util.math.ChunkPos;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -192,8 +193,8 @@ public class TestLakeDestinationFinder {
         ChunkPos from = LakeDestinationFinder.rawPos(CONFIG, new GridPos(-50, -50));
         ChunkPos to = LakeDestinationFinder.rawPos(CONFIG, new GridPos(50, 50));
         Random rand = new Random(seed);
-        int xCheck = rand.nextInt(from.x(), to.x());
-        int zCheck = rand.nextInt(from.z(), to.z());
+        int xCheck = rand.nextInt(from.x, to.x);
+        int zCheck = rand.nextInt(from.z, to.z);
         ChunkPos checkChunk = new ChunkPos(xCheck, zCheck);
         // overflows when being integer
         long bestDistance = Long.MAX_VALUE;
@@ -206,8 +207,8 @@ public class TestLakeDestinationFinder {
                 } catch (RuntimeException exc) {
                     continue;
                 }
-                int dx = currChunk.x() - xCheck;
-                int dz = currChunk.z() - zCheck;
+                int dx = currChunk.x - xCheck;
+                int dz = currChunk.z - zCheck;
                 long currDistSq = (long) dx * dx + (long) dz * dz;
                 if (currDistSq == bestDistance) {
                     bestChunks.add(currChunk);

@@ -3,6 +3,8 @@ package com.gmail.guitaekm.enderlakes;
 import com.google.common.collect.Streams;
 import net.minecraft.util.math.random.LocalRandom;
 import net.minecraft.util.math.random.Random;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.World;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -44,6 +46,7 @@ public class LakeDestinationFinder {
     }
 
     // it is difficult to include minecraft's ChunkPos into the test module, I wasn't able to
+    /*
     public record ChunkPos(int x, int z) {
         public net.minecraft.util.math.ChunkPos toMinecraft() {
             return new net.minecraft.util.math.ChunkPos(x, z);
@@ -52,6 +55,8 @@ public class LakeDestinationFinder {
             this(pos.x, pos.z);
         }
     }
+
+     */
 
     public record GridPos(int x, int y) { }
 
@@ -245,8 +250,7 @@ public class LakeDestinationFinder {
                     continue;
                 }
                 int currDistanceSquared = pos(config, seed, currGridPos)
-                        .toMinecraft()
-                        .getSquaredDistance(pos.toMinecraft());
+                        .getSquaredDistance(pos);
                 if (currDistanceSquared == nearestDistanceSquared) {
                     nearestLake.add(currGridPos);
                 }

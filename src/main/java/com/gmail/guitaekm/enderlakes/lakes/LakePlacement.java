@@ -2,7 +2,6 @@ package com.gmail.guitaekm.enderlakes.lakes;
 
 import com.gmail.guitaekm.enderlakes.Enderlakes;
 import com.gmail.guitaekm.enderlakes.LakeDestinationFinder;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.util.dynamic.Codecs;
@@ -34,12 +33,11 @@ public class LakePlacement extends RandomSpreadStructurePlacement {
         Set<LakeDestinationFinder.GridPos> positions = LakeDestinationFinder.findNearestLake(
                 Enderlakes.CONFIG,
                 calculator.getStructureSeed() + this.getSalt(),
-                new LakeDestinationFinder.ChunkPos(chunkX, chunkZ)
+                new ChunkPos(chunkX, chunkZ)
         );
         for (LakeDestinationFinder.GridPos pos : positions) {
             ChunkPos chunkPos = LakeDestinationFinder
-                    .pos(Enderlakes.CONFIG, calculator.getStructureSeed() + this.getSalt(), pos)
-                    .toMinecraft();
+                    .pos(Enderlakes.CONFIG, calculator.getStructureSeed() + this.getSalt(), pos);
             if (chunkPos.x == chunkX && chunkPos.z == chunkZ) {
                 return true;
             }
