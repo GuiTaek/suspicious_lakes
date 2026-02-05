@@ -142,7 +142,7 @@ public class SuspiciousFluidBlock extends FluidBlock {
                 .getChunk(
                         destChunk.x,
                         destChunk.z,
-                        ChunkStatus.STRUCTURE_REFERENCES,
+                        ChunkStatus.FULL,
                         true
                 ).sampleHeightmap(
                         Heightmap.Type.WORLD_SURFACE,
