@@ -122,6 +122,18 @@ public class TestLakeDestinationFinder {
     }
 
     @Test
+    public void testCInvOnlyIncrease() {
+        int maxCoord = -1;
+        for (int i = 1; i < 10_000; i++) {
+            GridPos pos = LakeDestinationFinder.c(i);
+            assert maxCoord <= pos.x();
+            assert maxCoord <= pos.y();
+            maxCoord = Math.max(pos.x(), pos.y());
+        }
+
+    }
+
+    @Test
     public void fInvInvOffF() {
         // this is approximately the whole range f is meant to work on
         for (int c = -350; c <= 350; c++) {
