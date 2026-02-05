@@ -300,9 +300,7 @@ public class LakeDestinationFinder {
             BiFunction<Integer, Integer, Long> multiplyOperation,
             int neutralElement
     ) {
-        if (n == 1) {
-            return 0;
-        }
+        assert n > 1;
         int result = neutralElement;
         b = b % n;
         while (e > 0) {
