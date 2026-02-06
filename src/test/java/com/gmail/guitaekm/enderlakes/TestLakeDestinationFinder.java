@@ -480,6 +480,27 @@ public class TestLakeDestinationFinder {
         }
     }
 
+    @Test
+    public void reproduceOverflowBug() {
+        int gInv = 234_200_297;
+        int pi = 1_026_132_924;
+        int nrLakes = 1_107_891_224;
+        assert LakeDestinationFinder.modularMultiplicationByDoubling(gInv, pi, nrLakes) > 0;
+    }
+
+    @Test
+    public void testMultiplicationPositive() {
+        Random random = new Random(42);
+        for (int N = 100; N < 10_000; N++) {
+            while (!BigInteger.valueOf(N).isProbablePrime(1_000)) {
+                N++;
+            }
+            int a = random.nextInt(1, N);
+            int b = random.nextInt(1, N);
+            assert LakeDestinationFinder.modularMultiplicationByDoubling(a, b, N) > 0;
+        }
+    }
+
     public <T> void testAbstractCycles(
             Supplier<T> startElements,
             UnaryOperator<T> advancer,

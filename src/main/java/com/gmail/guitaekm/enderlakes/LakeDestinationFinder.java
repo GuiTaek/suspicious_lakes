@@ -317,14 +317,17 @@ public class LakeDestinationFinder {
         b = b % n;
         while (e > 0) {
             if (e % 2 == 1) {
-                // conversion allowed because of % n and n is int
-                result = (int)((multiplyOperation.apply(result, b) % n + n) % n);
+                result = mod(multiplyOperation.apply(result, b), n);
             }
             e = e >> 1;
-            // conversion allowed because of % n and n is int
-            b = (int)((squareOperation.apply(b) % n + n) % n);
+            b = mod(squareOperation.apply(b), n);
         }
-        return (result % n + n) % n;
+        return mod(result, n);
+    }
+
+    private static int mod(long a, int N) {
+        // conversion allowed because of % n and n is int
+        return (int)((a % N + N) % N);
     }
 
     /**
