@@ -188,6 +188,7 @@ public class LakeDestinationFinder {
         if (x == 0 && y == 0) {
             throw new IllegalArgumentException("off shall not get the origin");
         }
+        // todo: better try with c, this way, the nr of lakes isn't used in lake placement
         Random random = Random.create(seed ^ ((long) x * config.nrLakes() + y));
         int offX, offZ;
         {
@@ -254,6 +255,7 @@ public class LakeDestinationFinder {
         for (int xDiff = -2; xDiff <= +2; xDiff++) {
             for (int yDiff = -2; yDiff <= +2; yDiff++) {
                 GridPos currGridPos = new GridPos(basePos.x + xDiff, basePos.y + yDiff);
+                // todo: better test for zero instead of catching an error
                 try {
                     rawPos(config, currGridPos);
                 } catch (IllegalArgumentException exc) {
