@@ -156,9 +156,9 @@ public class TestLakeDestinationFinder {
         int maxCoord = -1;
         for (int i = 1; i < 10_000; i++) {
             GridPos pos = LakeDestinationFinder.c(i);
-            assert maxCoord <= pos.x();
-            assert maxCoord <= pos.y();
-            maxCoord = Math.max(pos.x(), pos.y());
+            int newCoord = Math.max(Math.abs(pos.x()), Math.abs(pos.y()));
+            assert maxCoord <= newCoord;
+            maxCoord = newCoord;
         }
 
     }
