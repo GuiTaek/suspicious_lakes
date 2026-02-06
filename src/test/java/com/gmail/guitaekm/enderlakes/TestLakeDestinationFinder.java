@@ -142,32 +142,11 @@ public class TestLakeDestinationFinder {
                     .forEach(
                             pos -> {
                                 for (int rot = 0; rot < 4; rot++) {
-                                    GridPos newPos = LakeDestinationFinder.Matrix2d.ROTATIONS.get(rot).multiply(pos);
+                                    GridPos newPos = Matrix2d.ROTATIONS.get(rot).multiply(pos);
                                     assert LakeDestinationFinder.getRotation(newPos) == rot;
                                 }
                             }
                     );
-        }
-    }
-
-    @Test
-    public void testMatrixRotations() {
-        LakeDestinationFinder.Matrix2d currRot = LakeDestinationFinder.Matrix2d.IDENTITY;
-        for (int rot = 0; rot < 5; rot++) {
-            System.out.println(rot);
-            System.out.println(currRot);
-            System.out.println(LakeDestinationFinder.Matrix2d.ROTATIONS.get(rot % 4));
-            System.out.println();
-            assert currRot.equals(LakeDestinationFinder.Matrix2d.ROTATIONS.get(rot % 4));
-            currRot = currRot.multiply(LakeDestinationFinder.Matrix2d.SIMPLE_ROTATION);
-        }
-    }
-
-    @Test
-    public void testMatrixInv() {
-        for (int rot = 0; rot < 4; rot++) {
-            LakeDestinationFinder.Matrix2d mat = LakeDestinationFinder.Matrix2d.ROTATIONS.get(rot);
-            assert mat.multiply(mat.inv()).equals(LakeDestinationFinder.Matrix2d.IDENTITY);
         }
     }
 
