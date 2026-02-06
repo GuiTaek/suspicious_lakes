@@ -122,6 +122,56 @@ public class TestLakeDestinationFinder {
     }
 
     @Test
+    public void testGetRotationManual() {
+        assert LakeDestinationFinder.getRotation(1, 0) == 0;
+        assert LakeDestinationFinder.getRotation(1, 1) == 0;
+        assert LakeDestinationFinder.getRotation(0, 1) == 1;
+        assert LakeDestinationFinder.getRotation(-1, 1) == 1;
+        assert LakeDestinationFinder.getRotation(-1, 0) == 2;
+        assert LakeDestinationFinder.getRotation(-1, -1) == 2;
+        assert LakeDestinationFinder.getRotation(0, -1) == 3;
+        assert LakeDestinationFinder.getRotation(1, -1) == 3;
+    }
+
+    @Test
+    public void testGetRotationAutomatic() {
+        for (int radius = 1; radius < 50; radius++) {
+            int finalRadius = radius;
+            IntStream.rangeClosed(-radius + 1, +radius)
+                    .mapToObj(y -> new GridPos(finalRadius, y))
+                    .forEach(
+                            pos -> {
+                                for (int rot = 0; rot < 4; rot++) {
+                                    GridPos newPos = LakeDestinationFinder.Matrix2d.ROTATIONS.get(rot).multiply(pos);
+                                    assert LakeDestinationFinder.getRotation(newPos) == rot;
+                                }
+                            }
+                    );
+        }
+    }
+
+    @Test
+    public void testMatrixRotations() {
+        LakeDestinationFinder.Matrix2d currRot = LakeDestinationFinder.Matrix2d.IDENTITY;
+        for (int rot = 0; rot < 5; rot++) {
+            System.out.println(rot);
+            System.out.println(currRot);
+            System.out.println(LakeDestinationFinder.Matrix2d.ROTATIONS.get(rot % 4));
+            System.out.println();
+            assert currRot.equals(LakeDestinationFinder.Matrix2d.ROTATIONS.get(rot % 4));
+            currRot = currRot.multiply(LakeDestinationFinder.Matrix2d.SIMPLE_ROTATION);
+        }
+    }
+
+    @Test
+    public void testMatrixInv() {
+        for (int rot = 0; rot < 4; rot++) {
+            LakeDestinationFinder.Matrix2d mat = LakeDestinationFinder.Matrix2d.ROTATIONS.get(rot);
+            assert mat.multiply(mat.inv()).equals(LakeDestinationFinder.Matrix2d.IDENTITY);
+        }
+    }
+
+    @Test
     public void testCSurjective() {
         int RADIUS = 10;
         int DIAMETER = 2 * RADIUS + 1;

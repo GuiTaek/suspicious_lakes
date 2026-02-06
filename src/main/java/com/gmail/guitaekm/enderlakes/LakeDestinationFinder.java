@@ -6,6 +6,7 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -55,68 +56,115 @@ public class LakeDestinationFinder {
         // the ordering isn't relevant, because of g therefore no beautiful bijection
 
         // x can't be 0 but y can, then rotate to get every grid point except (0, 0)
-        int rotate = i2 % 4;
-        int i3 = i2 / 4;
 
-        // calculate s := x + y by solving for s(s + 1) / 2 = n = i3 + 1 and rounding up (mathematical proof omitted)
-        double sFloat = -0.5d + Math.sqrt(1.25d + 2d * (double)i3);
+        // this is too early for rotate
+        //int rotate = i2 % 4;
+        //int i3 = i2 / 4;
+        int i3 = i2;
+
+        // calculate rotation rot, radius r and angle aby solving for 8 + 16 + 24 + ... + 8(r - 1) + 2r * rot + a = i3
+        // where a is between 0 and 2r - 1
+        double rDouble = (4d + Math.sqrt(16d + 16d * i3)) / 8d;
+
         // if the ceil method would return 0.99999999999999999999999999999998 then (int) would return 0, which is not
         // want. I'm not sure, if this is really the case, and it isn't worth it looking it up.
-        int s = (int) (Math.ceil(sFloat) + 0.1d);
-        int y = s * (s + 1) / 2 - i3 - 1;
+        int radius = (int) (Math.floor(rDouble) + 0.1);
+        int rotate = i3 / 2 / radius - 2 * (radius - 1);
+        int angle = i3 - 4 * (radius - 1) * radius - rotate * 2 * radius;
 
-        int x = s - y;
+        int x = radius;
+        int y = angle - radius + 1;
+        GridPos rawPos = new GridPos(x, y);
+        return Matrix2d.ROTATIONS.get(rotate).multiply(rawPos);
+    }
 
-        return switch (rotate) {
-            case 0 -> new GridPos(+x, +y);
-            case 1 -> new GridPos(-y, +x);
-            case 2 -> new GridPos(-x, -y);
-            case 3 -> new GridPos(+y, -x);
-            default -> throw new IllegalStateException("Rotating should be one of 0, 1, 2, 3. Inform the developer of this mod.");
-        };
+    public static int getRotation(GridPos pos) {
+        return getRotation(pos.x(), pos.y());
     }
 
     public static int getRotation(int x, int y) {
         // remember y can be 0
         assert x != 0 || y != 0;
-        if (x == 0) {
+
+        // x > 0, Math.abs(y) < +x: 0
+        // y > 0, Math.abs(x) < +y: 1
+        // x < 0, Math.abs(y) < -x: 2
+        // y < 0, Math.abs(x) < -y: 3
+
+        if (Math.abs(x) < Math.abs(y)) {
             return y > 0 ? 1 : 3;
         }
-        if (y == 0) {
+
+        if (Math.abs(x) > Math.abs(y)) {
             return x > 0 ? 0 : 2;
         }
+
+        // x != 0 && y != 0
+        // Math.abs(x) == Math.abs(y)
+        // ++: 0
+        // -+: 1
+        // --: 2
+        // +-: 3
         if (x > 0) {
-            if (y > 0) {
-                return 0;
-            }
-            return 3;
+            return y > 0 ? 0 : 3;
+        } else {
+            return y > 0 ? 1 : 2;
         }
-        if (y > 0) {
-            return 1;
-        }
-        return 2;
     }
 
+    public record Matrix2d(int aa, int ab, int ba, int bb) {
+        public Matrix2d multiply(Matrix2d other) {
+            return new Matrix2d(
+                    this.aa * other.aa + this.ab * other.ba,
+                    this.aa * other.ab + this.ab * other.bb,
+                    this.ba * other.aa + this.bb * other.ba,
+                    this.ba * other.ab + this.bb * other.bb
+            );
+        }
+        public static Matrix2d IDENTITY = new Matrix2d(
+                1, 0,
+                0, 1
+        );
+        public static Matrix2d SIMPLE_ROTATION = new Matrix2d(
+                0, -1,
+                1, 0
+        );
+        public Matrix2d inv() {
+            return new Matrix2d(
+                    bb, -ab,
+                    -ba, aa
+            );
+        }
+        public GridPos multiply(GridPos from) {
+            return new GridPos(
+                    this.aa * from.x() + this.ab * from.y(),
+                    this.ba * from.x() + this.bb * from.y()
+            );
+        }
+        public static List<Matrix2d> ROTATIONS = List.of(
+                IDENTITY,
+                SIMPLE_ROTATION,
+                SIMPLE_ROTATION.multiply(SIMPLE_ROTATION),
+                SIMPLE_ROTATION.multiply(SIMPLE_ROTATION)
+                        .multiply(SIMPLE_ROTATION)
+        );
+    }
+    public static int cInv(GridPos pos) {
+        if (pos.equals(new GridPos(0, 0))) {
+            throw new IllegalArgumentException("May not use origin in cInv. Contact the developer of this mod.");
+        }
+        int rotation = getRotation(pos);
+        GridPos normalizedPos = Matrix2d.ROTATIONS.get(rotation).inv().multiply(pos);
+
+        int radius = normalizedPos.x();
+
+        // between 0 and 2 * radius - 1
+        int angle = normalizedPos.y() + radius - 1;
+
+        return 4 * (radius - 1) * radius + rotation * 2 * radius + angle + 1;
+    }
     public static int cInv(int x, int y) {
-        if (x == 0 && y == 0) {
-            throw new IllegalArgumentException("May not contain the origin");
-        }
-
-        int rotation = getRotation(x, y);
-        x = Math.abs(x);
-        y = Math.abs(y);
-        switch(rotation) {
-            case 1, 3:
-                int temp = x;
-                x = y;
-                y = temp;
-        }
-        int s = x + y;
-        int res = (s + 1) * s / 2 - y - 1;
-        return res * 4 + rotation + 1;
-    }
-    public static int cInv(GridPos output) {
-        return cInv(output.x, output.y);
+        return cInv(new GridPos(x, y));
     }
     public static int f(ConfigInstance config, int c) {
         int signum = Integer.compare(c, 0);
