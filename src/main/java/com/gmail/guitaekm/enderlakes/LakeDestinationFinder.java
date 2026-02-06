@@ -1,6 +1,7 @@
 package com.gmail.guitaekm.enderlakes;
 
 import com.google.common.collect.Streams;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.LocalRandom;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.util.math.ChunkPos;
@@ -148,6 +149,36 @@ public class LakeDestinationFinder {
     public static int fInvFloor(ConfigInstance config, int c) {
         int signum = Integer.compare(c, 0);
         return signum * (int) Math.floor(signum * fInvRaw(config, c));
+    }
+
+    public static int fInvCeil(ConfigInstance config, int c) {
+        int signum = Integer.compare(c, 0);
+        return signum * (int) Math.ceil(signum * fInvRaw(config, c));
+    }
+
+    /**
+     * generates a prime needed for this whole math depending on the world border
+     * @param config the config for which the prime number will be generated. nrLakes and factsPhi will be ignored
+     * @param border the distance in x or z direction from the border to spawn
+     * @param signum the direction the prime is searched in (positive or negative). Must be -1 or 1. If positive,
+     *               there might be some lake cycles on the map that have one or unlikely more than one lake removed.
+     *               Can lead to lakes pointing on themselves. If negative, the last lakes of the map may be one-directional
+     * @return the new prime
+     */
+    public static int findNewNrLakes(ConfigInstance config, int border, int signum) {
+        assert Math.abs(signum) == 1;
+        // this is the position of the last raw Pos, therefore approximately the last lake
+        ChunkPos maxChunk = new ChunkPos(new BlockPos(border, 0, -border));
+
+        GridPos gridPos = signum == -1 ? new GridPos(fInvFloor(config, maxChunk.x), fInvFloor(config, maxChunk.z))
+                : new GridPos(fInvCeil(config, maxChunk.x), fInvCeil(config, maxChunk.z));
+        BigInteger prime = BigInteger.valueOf(cInv(gridPos));
+        while (!prime.isProbablePrime(1_000)) {
+            prime = prime.add(BigInteger.valueOf(signum));
+        }
+
+        // the primes don't get big here, it's just the method that requires a BigInteger
+        return prime.intValue();
     }
 
     /**

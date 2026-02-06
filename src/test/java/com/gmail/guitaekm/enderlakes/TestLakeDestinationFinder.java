@@ -1,6 +1,7 @@
 package com.gmail.guitaekm.enderlakes;
 
 import com.gmail.guitaekm.enderlakes.LakeDestinationFinder.GridPos;
+import net.minecraft.util.math.BlockPos;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -229,6 +230,19 @@ public class TestLakeDestinationFinder {
             int signum = Integer.compare(fC, 0);
             assertEquals(c, LakeDestinationFinder.fInv(CONFIG, fC - signum));
             assertEquals(c, LakeDestinationFinder.fInv(CONFIG, fC + signum));
+        }
+    }
+
+    @Test
+    public void fInvCeilAboveF() {
+        for (int c = -350; c <= 350; c++) {
+            if (Math.abs(c) < 2) {
+                continue;
+            }
+            int fC = LakeDestinationFinder.f(CONFIG, c);
+            int signum = Integer.compare(fC, 0);
+            assertEquals(c, LakeDestinationFinder.fInvCeil(CONFIG, fC - signum));
+            assertEquals(c + signum, LakeDestinationFinder.fInvCeil(CONFIG, fC + signum));
         }
     }
 
@@ -538,6 +552,30 @@ public class TestLakeDestinationFinder {
 
         }
     }
+
+    @Test
+    public void testFindNewLakes() {
+        for (ConfigInstance config : List.of(smallPrimeConfig, CONFIG)) {
+            for (int border = 5_000; border <= 100_000; border += 1_000) {
+                {
+                    int nrLakes = LakeDestinationFinder.findNewNrLakes(config, border, -1);
+                    int lastLake = nrLakes - 1;
+                    ChunkPos lastChunk = LakeDestinationFinder.rawPos(config, LakeDestinationFinder.c(lastLake));
+                    BlockPos lastPos = lastChunk.getBlockPos(8, 0, 8);
+                    assert Math.abs(lastPos.getX()) <= border;
+                    assert Math.abs(lastPos.getY()) <= border;
+                }
+                {
+                    int nrLakes = LakeDestinationFinder.findNewNrLakes(config, border, +1);
+                    int lastLake = nrLakes - 1;
+                    ChunkPos lastChunk = LakeDestinationFinder.rawPos(config, LakeDestinationFinder.c(lastLake));
+                    BlockPos lastPos = lastChunk.getBlockPos(8, 0, 8);
+                    assert Math.abs(lastPos.getX()) > border || Math.abs(lastPos.getY()) > border;
+                }
+            }
+        }
+    }
+
     @Test
     public void testGInv() {
         Random random = new Random(42);
