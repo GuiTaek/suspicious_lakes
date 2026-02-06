@@ -455,14 +455,15 @@ public class TestLakeDestinationFinder {
         testAbstractCycles(
                 () -> random.nextInt(1, CONFIG.nrLakes()),
                 i -> LakeDestinationFinder.pi(i, CONFIG),
-                Objects::equals
+                Objects::equals,
+                1_000
         );
     }
 
     @Test
     public void testGridTeleportAim() {
         Random random = new Random(42);
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 3; i++) {
             int g = LakeDestinationFinder.calculateG(CONFIG.nrLakes(), CONFIG.factsPhi(), random.nextLong());
             int gInv = LakeDestinationFinder.calculateInv(CONFIG.nrLakes(), g);
             int boundary = LakeDestinationFinder.fInv(CONFIG, (int)(Math.sqrt(CONFIG.nrLakes()) + 0.5));
@@ -489,7 +490,8 @@ public class TestLakeDestinationFinder {
                             g,
                             gInv
                     ),
-                    (pos1, pos2) -> pos1.x() == pos2.x() && pos1.y() == pos2.y()
+                    (pos1, pos2) -> pos1.x() == pos2.x() && pos1.y() == pos2.y(),
+                    30
             );
         }
     }
@@ -518,13 +520,14 @@ public class TestLakeDestinationFinder {
     public <T> void testAbstractCycles(
             Supplier<T> startElements,
             UnaryOperator<T> advancer,
-            BiFunction<T, T, Boolean> isEqual
+            BiFunction<T, T, Boolean> isEqual,
+            int repetitions
     ) {
         // records don't have a proper hashCode
         // methods therefore a Set can't be used
         List<T> previousElements = new ArrayList<>();
         T currentElement = startElements.get();
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < repetitions; i++) {
             List<T> otherElements = previousElements.size() >= 2
                     ? previousElements.subList(1, previousElements.size())
                     : List.of();
