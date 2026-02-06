@@ -126,7 +126,7 @@ public class TestLakeDestinationFinder {
         int RADIUS = 10;
         int DIAMETER = 2 * RADIUS + 1;
         boolean[][] gridFlags = new boolean[DIAMETER][DIAMETER];
-        for (int i = 1; i <= DIAMETER * DIAMETER; i++) {
+        for (int i = 1; i < DIAMETER * DIAMETER; i++) {
             GridPos pos = LakeDestinationFinder.c(i);
             int offX = pos.x() + RADIUS;
             int offY = pos.y() + RADIUS;
@@ -134,18 +134,18 @@ public class TestLakeDestinationFinder {
             assert offY <= DIAMETER;
             gridFlags[offX][offY] = true;
         }
-        assert !gridFlags[RADIUS + 1][RADIUS + 1];
-        for (int offX = 0; offX <= DIAMETER; offX++) {
-            if (offX != RADIUS + 1) {
-                for (int offY = 0; offY <= DIAMETER; offY++) {
+        assert !gridFlags[RADIUS][RADIUS];
+        for (int offX = 0; offX < DIAMETER; offX++) {
+            if (offX != RADIUS) {
+                for (int offY = 0; offY < DIAMETER; offY++) {
                     assert gridFlags[offX][offY];
                 }
                 continue;
             }
-            for (int offY = 0; offY <= RADIUS; offY++) {
+            for (int offY = 0; offY <= RADIUS - 1; offY++) {
                 assert gridFlags[offX][offY];
             }
-            for (int offY = RADIUS + 2; offY <= DIAMETER; offY++) {
+            for (int offY = RADIUS + 1; offY < DIAMETER; offY++) {
                 assert gridFlags[offX][offY];
             }
         }
