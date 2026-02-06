@@ -41,12 +41,12 @@ public class LakePlacement extends RandomSpreadStructurePlacement {
         // todo: switch to chunkRandom
         Set<LakeDestinationFinder.GridPos> positions = LakeDestinationFinder.findNearestLake(
                 Enderlakes.CONFIG,
-                calculator.getStructureSeed() + this.getSalt(),
+                calculator.getStructureSeed(),
                 new ChunkPos(chunkX, chunkZ)
         );
         for (LakeDestinationFinder.GridPos pos : positions) {
             ChunkPos chunkPos = LakeDestinationFinder
-                    .pos(Enderlakes.CONFIG, calculator.getStructureSeed() + this.getSalt(), pos);
+                    .pos(Enderlakes.CONFIG, calculator.getStructureSeed(), pos);
             if (chunkPos.x == chunkX && chunkPos.z == chunkZ) {
                 return true;
             }
