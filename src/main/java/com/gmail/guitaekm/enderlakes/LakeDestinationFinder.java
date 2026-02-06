@@ -6,6 +6,7 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 
+import java.math.BigInteger;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -125,16 +126,28 @@ public class LakeDestinationFinder {
 
         return 4 * (radius - 1) * radius + rotation * 2 * radius + angle + 1;
     }
+
     public static int cInv(int x, int y) {
         return cInv(new GridPos(x, y));
     }
+
     public static int f(ConfigInstance config, int c) {
         int signum = Integer.compare(c, 0);
         return (int) (signum * config.minimumDistance() * Math.round(Math.pow(Math.abs(c), config.powerDistance())));
     }
-    public static int fInv(ConfigInstance config, int c) {
+
+    public static double fInvRaw(ConfigInstance config, int c) {
         int signum = Integer.compare(c, 0);
-        return signum * (int) (Math.round(Math.pow((double) Math.abs(c) / config.minimumDistance(), 1d / config.powerDistance())));
+        return signum * Math.pow((double) Math.abs(c) / config.minimumDistance(), 1d / config.powerDistance());
+    }
+
+    public static int fInv(ConfigInstance config, int c) {
+        return (int) Math.round(fInvRaw(config, c));
+    }
+
+    public static int fInvFloor(ConfigInstance config, int c) {
+        int signum = Integer.compare(c, 0);
+        return signum * (int) Math.floor(signum * fInvRaw(config, c));
     }
 
     /**

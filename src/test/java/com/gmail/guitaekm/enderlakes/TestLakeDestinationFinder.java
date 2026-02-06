@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigInteger;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
@@ -202,6 +203,32 @@ public class TestLakeDestinationFinder {
                         LakeDestinationFinder.f(CONFIG, c)
                     )
             );
+        }
+    }
+
+    @Test
+    public void fInvFloorBelowF() {
+        for (int c = -350; c <= 350; c++) {
+            if (Math.abs(c) < 2) {
+                continue;
+            }
+            int fC = LakeDestinationFinder.f(CONFIG, c);
+            int signum = Integer.compare(fC, 0);
+            assertEquals(c - signum, LakeDestinationFinder.fInvFloor(CONFIG, fC - signum));
+            assertEquals(c, LakeDestinationFinder.fInvFloor(CONFIG, fC + signum));
+        }
+    }
+
+    @Test
+    public void fInvRoundF() {
+        for (int c = -350; c <= 350; c++) {
+            if (Math.abs(c) < 2) {
+                continue;
+            }
+            int fC = LakeDestinationFinder.f(CONFIG, c);
+            int signum = Integer.compare(fC, 0);
+            assertEquals(c, LakeDestinationFinder.fInv(CONFIG, fC - signum));
+            assertEquals(c, LakeDestinationFinder.fInv(CONFIG, fC + signum));
         }
     }
 
