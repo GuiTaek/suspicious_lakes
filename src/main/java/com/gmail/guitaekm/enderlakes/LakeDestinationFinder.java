@@ -219,8 +219,7 @@ public class LakeDestinationFinder {
         if (x == 0 && y == 0) {
             throw new IllegalArgumentException("off shall not get the origin");
         }
-        // todo: better try with c, this way, the nr of lakes isn't used in lake placement
-        Random random = Random.create(seed ^ ((long) x * config.nrLakes() + y));
+        Random random = Random.create(seed ^ cInv(new GridPos(x, y)));
         int offX, offZ;
         {
             ChunkPos fromPos;
