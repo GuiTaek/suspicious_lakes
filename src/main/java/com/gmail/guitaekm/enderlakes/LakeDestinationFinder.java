@@ -418,12 +418,18 @@ public class LakeDestinationFinder {
         assert num > 1;
         assert num < 300_000_000;
         ArrayList<Integer> factors = new ArrayList<>();
-        for (int a = 2;  num>1; ) {
-            if (num%a==0) {
+        for (int a = 2;  num > 1; ) {
+            boolean changed = false;
+            while (num % a == 0) {
                 factors.add(a);
-                num/=a;
+                num /= a;
+                changed = true;
             }
-            else {
+            if (changed && BigInteger.valueOf(num).isProbablePrime(200)) {
+                factors.add(num);
+                break;
+            }
+            if (!changed) {
                 a++;
             }
         }
