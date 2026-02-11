@@ -31,7 +31,24 @@ public class TestLakeDestinationFinder {
             new ConfigValues().minimumDistance,
             new int[] {2, 3, 3}
     );
-    static ConfigInstance CONFIG =  new ConfigInstance();
+    final private static ConfigInstance CONFIG =  new ConfigInstance();
+
+    static {
+        int nrLakes = LakeDestinationFinder.findNewNrLakes(CONFIG, 30_000, -1);
+        int[] factsPhi = LakeDestinationFinder.primeFactors(nrLakes - 1)
+                .stream()
+                .mapToInt(i -> i)
+                .toArray();
+
+        MIDDLE_CONFIG = new ConfigInstance(
+                nrLakes,
+                CONFIG.powerDistance(),
+                CONFIG.cycleWeights(),
+                CONFIG.minimumDistance(),
+                factsPhi
+        );
+    }
+    final private static ConfigInstance MIDDLE_CONFIG;
 
     @Test
     public void testPi() {
@@ -610,5 +627,47 @@ public class TestLakeDestinationFinder {
             testGIsPrimitiveRoot(CONFIG, random.nextLong());
             testGIsPrimitiveRoot(smallPrimeConfig, random.nextLong());
         }
+    }
+
+    private boolean isUnsafeChunk(ChunkPos pos) {
+        return Math.abs(pos.x) <= 64 && Math.abs(pos.z) <= 64;
+    }
+
+    public void testTeleportAimNeverUnsafeWithConfig(Random random, ConfigInstance config) {
+        for (int i = 0; i < 1_000; i++) {
+            int x = random.nextInt(1, config.nrLakes());
+            int z = random.nextInt(config.nrLakes());
+            if (random.nextBoolean()) {
+                x = -x;
+            }
+            if (random.nextBoolean()) {
+                z = -z;
+            }
+            if (random.nextBoolean()) {
+                int temp = x;
+                x = z;
+                z = temp;
+            }
+            long seed = random.nextLong();
+            int g = LakeDestinationFinder.getG(config.nrLakes(), config.factsPhi(), seed);
+            int gInv = LakeDestinationFinder.getInv(config.nrLakes(), g);
+            ChunkPos pos = LakeDestinationFinder.teleportAim(
+                    config,
+                    new ChunkPos(x, z),
+                    net.minecraft.util.math.random.Random.create(seed),
+                    g,
+                    gInv,
+                    seed
+            );
+            assert !isUnsafeChunk(pos);
+        }
+    }
+
+    @Test
+    public void testTeleportAimNeverUnsafe() {
+        Random random = new Random(42);
+        testTeleportAimNeverUnsafeWithConfig(random, CONFIG);
+        testTeleportAimNeverUnsafeWithConfig(random, MIDDLE_CONFIG);
+        testTeleportAimNeverUnsafeWithConfig(random, smallPrimeConfig);
     }
 }
