@@ -213,7 +213,7 @@ public class LakeDestinationFinder {
      * @param seed the seed of the world or the random generator if not used in a minecraft setting
      * @param x the grid x position
      * @param y the grid y position
-     * @return the chunk where the lake should ly in
+     * @return the chunk where the lake should lie in
      */
     public static ChunkPos pos(ConfigInstance config, long seed, int x, int y) {
         if (x == 0 && y == 0) {

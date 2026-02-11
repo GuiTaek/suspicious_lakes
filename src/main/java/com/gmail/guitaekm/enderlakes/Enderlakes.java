@@ -27,7 +27,7 @@ public class Enderlakes implements ModInitializer {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-	public static final ConfigInstance CONFIG = new ConfigInstance();
+	public static final ConfigInstance CONFIG = new ConfigInstance().autoupdated();
 
 	public static final FlowableFluid SUSPICIOUS_LIQUID_STILL_FLUID = Registry.register(
 			Registries.FLUID,
