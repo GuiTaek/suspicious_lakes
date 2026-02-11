@@ -4,7 +4,7 @@
 | ------- | --------------- | ---------------------------------- |
 |         | nrLakes         | n                                  |
 |         | powerDistance   | e                                  |
-|         | cycleWeights    | *                                  |
+|         | cycleWeights    | relates to  $n1, \ldots, n_k$      |
 |         | minimumDistance | d                                  |
 |         | factsPhi        | list of factors of $\phi(n)=n - 1$ |
 
@@ -28,7 +28,7 @@ calculated lazy
 ### n
 is a large prime
 
-defined in code or maybe config
+calculated from the world border
 
 ### c[.]
 A bijection that maps $\mathbb N \to \mathbb Z \times \mathbb Z$
@@ -38,11 +38,11 @@ calculated lazy
 ### pos[., .]
 The base chunk positions of the lakes based on x and y integer coordinates. An example for this would be:
 
-$f(c) = d \cdot |c|^e + 64$ if $c > 0$
+$f(c) = d \cdot |c|^e$ if $c > 0$
 
 $f(0) = 0$ and
 
-$f(c) = -d \cdot |c|^e - 64$ if $c < 0$
+$f(c) = -d \cdot |c|^e$ if $c < 0$
 
 $pos[0, 0] = null$
 
@@ -51,6 +51,9 @@ $pos[x, y] = [f(x), f(y)]$
 d is configurable
 
 calculated lazy
+
+### o
+The integer since when the grid positions of c[o + 1] becomes safe (not inside the biome minecraft:the_end)
 
 ## Seed-dependent things
 ### g
@@ -67,13 +70,11 @@ calculated eagerly
 
 off[0, 0] = null
 
-off[1, -1] = [rand(pos[x, y].x, pos[x + 1, y].x, rand(pos[x, y - 1].y, pos[x, y].y)]
-
-off[1, 0] = [rand(pos[x, y].x, pos[x + 1, y].x, rand(pos[x, y - 1].y, pos[x, y + 1].y)]
-
-...
+usually
 
 off[x, y] = [rand(pos[x - 1, y].x, pos[x + 1, y].x), rand(pos[x, y - 1].y, pos[x, y + 1])]
+
+if off tries to get an unsafe position, it will instead use x or y correspondingly
 
 This helps placing the lakes a little bit more random so they doesn't appear to be in a grid.
 
@@ -89,6 +90,6 @@ $pos[x, y] + off[x, y]$
 2a. calculate the position of the lake at the iterating position and calculate the distance to the current chunk
 2b. the "winning" (x', y') coordinates is the result
 ### calculate the next lake
-1. calculate the nearest lake to be at (x, y)
-2. calculate $[x', y'] = c[g^{-1} \cdot (\pi \circ (g \cdot c^{-1}[x, y]))]$
+1. calculate the nearest lake to be at grid coordinates (x, y)
+2. calculate $[x', y'] = c[g^{-1} \cdot (\pi \circ (g \cdot (c^{-1}[x, y] - o))) + o]$
 3. calculate the position of the lake at grid coordinate (x', y') and return this
