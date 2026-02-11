@@ -119,6 +119,9 @@ public class SuspiciousFluidBlock extends FluidBlock {
     }
 
     public boolean teleport(World world, Entity entity, BlockPos fromPos) {
+        if (!WorldBorderConfigUpdater.INSTANCE.mayUseLakes()) {
+            return false;
+        }
         long seed = Objects.requireNonNull(world.getServer()).getOverworld().getSeed();
         int g = LakeDestinationFinder.getG(
                 Enderlakes.CONFIG.nrLakes(),

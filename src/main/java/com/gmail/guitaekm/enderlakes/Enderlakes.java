@@ -75,5 +75,6 @@ public class Enderlakes implements ModInitializer {
 	@Override
 	public void onInitialize() {
         Structures.load();
+        WorldBorderConfigUpdater.INSTANCE.register();
 	}
 }
