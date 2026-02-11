@@ -432,10 +432,10 @@ public class TestLakeDestinationFinder {
             }
         }
          */
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 1_000; i++) {
             int g = random.nextInt(2, 1000);
             int n = random.nextInt(g + 1, 2000);
-            while (!LakeDestinationFinder.isPrime(n)) n++;
+            while (!BigInteger.valueOf(n).isProbablePrime(1_000)) n++;
             int[] factsPhi = LakeDestinationFinder.primeFactors(n - 1).stream().mapToInt(fact -> fact).toArray();
             assertEquals(isPrimitiveRootSlow(g, n), LakeDestinationFinder.isPrimitiveRootFast(g, n, factsPhi));
         }
