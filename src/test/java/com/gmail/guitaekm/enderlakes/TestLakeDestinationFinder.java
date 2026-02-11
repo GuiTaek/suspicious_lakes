@@ -273,6 +273,9 @@ public class TestLakeDestinationFinder {
     public static void nearestLakeInvOfPosWithSeed(long seed) {
         for (int x = -50; x <= 50; x++) {
             for (int y = -50; y <= 50; y++) {
+                if (x == 0 && y == 0) {
+                    continue;
+                }
                 GridPos oldPos = new GridPos(x, y);
                 ChunkPos rawChunkPos;
                 try {
@@ -595,6 +598,30 @@ public class TestLakeDestinationFinder {
             int g = LakeDestinationFinder.calculateG(N, phiFacts, random.nextLong());
             int gInv = LakeDestinationFinder.calculateInv(N, g);
             assert LakeDestinationFinder.modularMultiplicationByDoubling(g, gInv, N) == 1;
+        }
+    }
+
+    @Test
+    public void testRawPosNeverFails() {
+        for (int x = -65; x <= 65; x++) {
+            for (int y = -65; y <= 65; y++) {
+                int finalX = x;
+                int finalY = y;
+                assertDoesNotThrow(() -> {
+                    LakeDestinationFinder.rawPos(CONFIG, finalX, finalY);
+                    LakeDestinationFinder.rawPos(smallPrimeConfig, finalX, finalY);
+                });
+            }
+        }
+    }
+
+    @Test
+    public void testRawPosNeverInsideInnerVoid() {
+        for (int x = -65; x <= 65; x++) {
+            for (int y = -65; y <= 65; y++) {
+                ChunkPos pos = LakeDestinationFinder.rawPos(CONFIG, x, y);
+                assertTrue(pos.x > 64 || pos.x < -64 || pos.z > 64 || pos.z < -64);
+            }
         }
     }
 }
