@@ -505,10 +505,9 @@ public class LakeDestinationFinder {
 
     public static int calculateG(int N, int[] factsPhi, long seed) {
         Random random = new LocalRandom(seed);
-        int g = random.nextBetween(1, N - 1);
-        while (isPrimitiveRootFast(g, N, factsPhi)) {
+        do {
             g = random.nextBetween(1, N - 1);
-        }
+        } while (!isPrimitiveRootFast(g, N, factsPhi));
         return g;
     }
 
