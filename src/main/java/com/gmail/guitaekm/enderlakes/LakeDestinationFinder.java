@@ -189,10 +189,6 @@ public class LakeDestinationFinder {
      * @return the chunk position that the grid position relates to in the minecraft world
      */
     public static ChunkPos rawPos(ConfigInstance config, int x, int y) {
-        // remove the part that corresponds to the inner circle of void
-        if (x >= -64 && Math.abs(y) <= 64) {
-            x += 128;
-        }
         ChunkPos res = new ChunkPos(f(config, x), f(config, y));
         if (-64 <= res.x && res.x <= +64
                 && -64 <= res.z && res.z <= +64) {
@@ -223,36 +219,43 @@ public class LakeDestinationFinder {
         if (x == 0 && y == 0) {
             throw new IllegalArgumentException("off shall not get the origin");
         }
-        ChunkPos pos = rawPos(config, x, y);
         Random random = Random.create(seed ^ cInv(new GridPos(x, y)));
         int offX, offZ;
         {
             ChunkPos fromPos;
-            if (pos.z == 64 && Math.abs(pos.x) <= 64) {
-                fromPos = rawPos(config, x, y);
-            } else {
+            try {
                 fromPos = rawPos(config, x, y - 1);
+                rawPos(config, x - 1, y - 1);
+                rawPos(config, x + 1, y - 1);
+            } catch(IllegalArgumentException exc) {
+                fromPos = rawPos(config, x, y);
             }
             ChunkPos toPos;
-            if (pos.z == -64 && Math.abs(pos.x) <= 64) {
-                toPos = rawPos(config, x, y);
-            } else {
+            try {
                 toPos = rawPos(config, x, y + 1);
+                rawPos(config, x - 1, y + 1);
+                rawPos(config, x + 1, y + 1);
+            } catch(IllegalArgumentException exc) {
+                toPos = rawPos(config, x, y);
             }
             offZ = random.nextBetween(fromPos.z, toPos.z);
         }
         {
             ChunkPos fromPos;
-            if (pos.x == 64 && Math.abs(pos.z) <= 64) {
-                fromPos = rawPos(config, x, y);
-            } else {
+            try {
                 fromPos = rawPos(config, x - 1, y);
+                rawPos(config, x - 1, y - 1);
+                rawPos(config, x - 1, y + 1);
+            } catch(IllegalArgumentException exc) {
+                fromPos = rawPos(config, x, y);
             }
             ChunkPos toPos;
-            if (pos.x == -64 && Math.abs(pos.z) <= 64) {
-                toPos = rawPos(config, x, y);
-            } else {
+            try {
                 toPos = rawPos(config, x + 1, y);
+                rawPos(config, x + 1, y - 1);
+                rawPos(config, x + 1, y + 1);
+            } catch(IllegalArgumentException exc) {
+                toPos = rawPos(config, x, y);
             }
             offX = random.nextBetween(fromPos.x, toPos.x);
         }
@@ -271,16 +274,7 @@ public class LakeDestinationFinder {
     }
 
     public static GridPos getRawGridPos(ConfigInstance config, ChunkPos pos) {
-        if (-64 <= pos.x && pos.x <= 64
-        && -64 <= pos.z && pos.z <= 64) {
-            throw new IllegalArgumentException("ChunkPos may not be inside the initial void");
-        }
-        int x = fInv(config, pos.x);
-        int y = fInv(config, pos.z);
-        if (x >= 64 && Math.abs(y) <= 64) {
-            x -= 128;
-        }
-        return new GridPos(x, y);
+        return new GridPos(fInv(config, pos.x), fInv(config, pos.z));
     }
 
     public static Set<GridPos> findNearestLake(ConfigInstance config, long seed, ChunkPos pos) {
@@ -291,7 +285,10 @@ public class LakeDestinationFinder {
         for (int xDiff = -2; xDiff <= +2; xDiff++) {
             for (int yDiff = -2; yDiff <= +2; yDiff++) {
                 GridPos currGridPos = new GridPos(basePos.x + xDiff, basePos.y + yDiff);
-                if (currGridPos.equals(new GridPos(0, 0))) {
+                // todo: better test for zero instead of catching an error
+                try {
+                    rawPos(config, currGridPos);
+                } catch (IllegalArgumentException exc) {
                     continue;
                 }
                 int currDistanceSquared = pos(config, seed, currGridPos)
