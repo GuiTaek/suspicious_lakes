@@ -19,6 +19,8 @@ public class ConfigInstance {
                 new ConfigValues().cycleWeights,
                 new ConfigValues().minimumDistance,
                 new ConfigValues().factsPhi,
+                // todo: change to true, when the dependencies are inverted
+                // it can't be changed now because else the test needs to load Enderlakes which crashes the tests
                 false
         );
     }

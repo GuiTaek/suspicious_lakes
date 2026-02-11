@@ -597,4 +597,18 @@ public class TestLakeDestinationFinder {
             assert LakeDestinationFinder.modularMultiplicationByDoubling(g, gInv, N) == 1;
         }
     }
+
+    public void testGIsPrimitiveRoot(ConfigInstance config, long seed) {
+        int g = LakeDestinationFinder.getG(CONFIG.nrLakes(), CONFIG.factsPhi(), seed);
+        assert LakeDestinationFinder.isPrimitiveRootFast(g, CONFIG.nrLakes(), CONFIG.factsPhi());
+    }
+
+    @Test
+    public void testGIsPrimitiveRoot() {
+        Random random = new Random(42);
+        for (int i = 0; i < 1000; i++) {
+            testGIsPrimitiveRoot(CONFIG, random.nextLong());
+            testGIsPrimitiveRoot(smallPrimeConfig, random.nextLong());
+        }
+    }
 }
