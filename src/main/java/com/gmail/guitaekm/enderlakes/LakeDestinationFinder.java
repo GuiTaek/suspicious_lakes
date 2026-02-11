@@ -208,7 +208,7 @@ public class LakeDestinationFinder {
     }
 
     /**
-     * in math.md it's pos + off
+     * in maths.md it's pos + off
      * @param config a config instance e.g. self defined through ConfigInstance or defined through the player
      * @param seed the seed of the world or the random generator if not used in a minecraft setting
      * @param x the grid x position
@@ -329,7 +329,7 @@ public class LakeDestinationFinder {
 
     }
 
-    /** implements <a href="https://en.wikipedia.org/wiki/Modular_exponentiation#Pseudocode">modular exponentation</a>
+    /** implements <a href="https://en.wikipedia.org/wiki/Modular_exponentiation#Pseudocode">modular exponentiation</a>
      * but with lambdas so you can use it for multiplication
      *
      * @return result of multiplication/exponentation
@@ -356,7 +356,7 @@ public class LakeDestinationFinder {
     }
 
     private static int mod(long a, int N) {
-        // conversion allowed because of % n and n is int
+        // conversion allowed because of % N and N is int
         return (int)((a % N + N) % N);
     }
 
@@ -388,6 +388,7 @@ public class LakeDestinationFinder {
 
     // not used
     public static int phi(int num) {
+        // todo: is this function wrong? shouldn't it be num - 1?
         ArrayList<Integer> raw_factors = primeFactors(num);
         ArrayList<Integer> unique_factors = new ArrayList<>();
         ArrayList<Integer> pow = new ArrayList<>();
@@ -436,6 +437,7 @@ public class LakeDestinationFinder {
         return factors;
     }
 
+    // todo: this has to be removed, because there is a faster method and this method shouldn't be used
     public static boolean isPrime(int n) {
         if (n < 2) {
             return false;
