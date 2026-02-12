@@ -2,7 +2,6 @@ package com.gmail.guitaekm.enderlakes;
 
 import com.gmail.guitaekm.enderlakes.LakeDestinationFinder.GridPos;
 import net.minecraft.util.math.BlockPos;
-import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -254,15 +253,20 @@ public class TestLakeDestinationFinder {
         }
     }
 
+    public void testFInvRawIntegerWhenCeilIsEqual(ConfigInstance config, int val) {
+        int processedValue = LakeDestinationFinder.f(config, LakeDestinationFinder.fInvCeil(config, val));
+
+        // in words: when val == f(fInvCeil(val)), fInvRaw(val) must be integer
+        assert processedValue != val || LakeDestinationFinder.fInvRaw(config, val) % 1 == 0.0;
+    }
+
     public void testFInvRawIntegerWhenCeilIsEqual(ConfigInstance config) {
         // this test was somehow difficult to craft and catches a bug I had in f
         Random random = new Random(42);
-        for (int i = 0; i < 100; i++) {
-            int val = random.nextInt(10_000);
-            int processedValue = LakeDestinationFinder.f(config, LakeDestinationFinder.fInvCeil(config, val));
-
-            // in words: when val == f(fInvCeil(val)), fInvRaw(val) must be integer
-            assert processedValue != val || LakeDestinationFinder.fInvRaw(config, val) % 1 == 0.0;
+        for (int smallVal = 5; smallVal < 1_000; smallVal++) {
+            int randVal = random.nextInt(10_000);
+            testFInvRawIntegerWhenCeilIsEqual(config, randVal);
+            testFInvRawIntegerWhenCeilIsEqual(config, smallVal);
         }
     }
 
@@ -473,7 +477,7 @@ public class TestLakeDestinationFinder {
         /*
         {
             int n = CONFIG.nrLakes();
-            for (int i = 0; i < 1; i++) {
+            for (int smallVal = 0; smallVal < 1; smallVal++) {
                 int g = random.nextInt(2, n);
                 boolean expected = isPrimitiveRootSlow(g, n);
                 boolean actual = LakeDestinationFinder.isPrimitiveRootFast(g, n, CONFIG.factsPhi());
