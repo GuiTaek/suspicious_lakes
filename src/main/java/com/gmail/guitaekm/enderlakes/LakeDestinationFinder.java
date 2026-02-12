@@ -168,7 +168,7 @@ public class LakeDestinationFinder {
     public static int findNewNrLakes(ConfigInstance config, int border, int signum) {
         assert Math.abs(signum) == 1;
         // this is the position of the last raw Pos, therefore approximately the last lake
-        ChunkPos maxChunk = new ChunkPos(new BlockPos(border, 0, -border));
+        ChunkPos maxChunk = new ChunkPos(new BlockPos(border / 2, 0, -border / 2));
 
         GridPos gridPos = signum == -1 ? new GridPos(fInvFloor(config, maxChunk.x), fInvFloor(config, maxChunk.z))
                 : new GridPos(fInvCeil(config, maxChunk.x), fInvCeil(config, maxChunk.z));
