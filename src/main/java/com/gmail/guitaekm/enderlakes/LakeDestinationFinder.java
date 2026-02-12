@@ -134,7 +134,7 @@ public class LakeDestinationFinder {
 
     public static int f(ConfigInstance config, int c) {
         int signum = Integer.compare(c, 0);
-        return (int) (signum * config.minimumDistance() * Math.round(Math.pow(Math.abs(c), config.powerDistance())));
+        return (int) (signum * Math.round(config.minimumDistance() * Math.pow(Math.abs(c), config.powerDistance())));
     }
 
     public static double fInvRaw(ConfigInstance config, int c) {
