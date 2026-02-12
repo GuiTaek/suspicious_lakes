@@ -24,12 +24,13 @@ public class TestLakeDestinationFinder {
     public static final Logger LOGGER = LoggerFactory.getLogger("lake_destination_tester");
     static ConfigInstance smallPrimeConfig = new ConfigInstance(
             19,
-            new ConfigValues().powerDistance,
+            ConfigValues.powerDistance,
             List.of(
                     1, 4, 3, 4, 0, 6
             ),
-            new ConfigValues().minimumDistance,
-            new int[] {2, 3, 3}
+            ConfigValues.minimumDistance,
+            new int[] {2, 3, 3},
+            100
     );
     final private static ConfigInstance CONFIG =  new ConfigInstance();
 
@@ -45,7 +46,8 @@ public class TestLakeDestinationFinder {
                 CONFIG.powerDistance(),
                 CONFIG.cycleWeights(),
                 CONFIG.minimumDistance(),
-                factsPhi
+                factsPhi,
+                64
         );
     }
     final private static ConfigInstance MIDDLE_CONFIG;
@@ -629,10 +631,6 @@ public class TestLakeDestinationFinder {
         }
     }
 
-    private boolean isUnsafeChunk(ChunkPos pos) {
-        return Math.abs(pos.x) <= 64 && Math.abs(pos.z) <= 64;
-    }
-
     public void testTeleportAimNeverUnsafeWithConfig(Random random, ConfigInstance config) {
         for (int i = 0; i < 1_000; i++) {
             int x = random.nextInt(1, config.nrLakes());
@@ -659,7 +657,7 @@ public class TestLakeDestinationFinder {
                     gInv,
                     seed
             );
-            assert !isUnsafeChunk(pos);
+            assert LakeDestinationFinder.isSafeChunk(pos);
         }
     }
 

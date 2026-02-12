@@ -11,14 +11,16 @@ public class ConfigInstance {
     final private int minimumDistance;
     final private int[] factsPhi;
     final private boolean autoUpdate;
+    final private int lastUnsafeChunk;
 
     public ConfigInstance() {
         this(
-                new ConfigValues().nrLakes,
-                new ConfigValues().powerDistance,
-                new ConfigValues().cycleWeights,
-                new ConfigValues().minimumDistance,
-                new ConfigValues().factsPhi,
+                ConfigValues.nrLakes,
+                ConfigValues.powerDistance,
+                ConfigValues.cycleWeights,
+                ConfigValues.minimumDistance,
+                ConfigValues.factsPhi,
+                ConfigValues.lastUnsafeChunkCoord,
                 // todo: change to true, when the dependencies are inverted
                 // it can't be changed now because else the test needs to load Enderlakes which crashes the tests
                 false
@@ -29,9 +31,10 @@ public class ConfigInstance {
             double powerDistance,
             List<Integer> cycleWeights,
             int minimumDistance,
-            int[] factsPhi
+            int[] factsPhi,
+            int lastUnsafeChunk
     ) {
-        this(nrLakes, powerDistance, cycleWeights, minimumDistance, factsPhi, false);
+        this(nrLakes, powerDistance, cycleWeights, minimumDistance, factsPhi, lastUnsafeChunk, false);
     }
     private ConfigInstance (
             int nrLakes,
@@ -39,6 +42,7 @@ public class ConfigInstance {
             List<Integer> cycleWeights,
             int minimumDistance,
             int[] factsPhi,
+            int lastUnsafeChunk,
             boolean autoUpdate
     ) {
         this.nrLakes = nrLakes;
@@ -46,6 +50,7 @@ public class ConfigInstance {
         this.cycleWeights = new ArrayList<>(cycleWeights);
         this.minimumDistance = minimumDistance;
         this.factsPhi = factsPhi;
+        this.lastUnsafeChunk = lastUnsafeChunk;
         this.autoUpdate = autoUpdate;
     }
 
@@ -56,6 +61,7 @@ public class ConfigInstance {
                 this.cycleWeights,
                 this.minimumDistance,
                 this.factsPhi,
+                this.lastUnsafeChunk,
                 true
         );
     }
@@ -80,5 +86,8 @@ public class ConfigInstance {
             return WorldBorderConfigUpdater.INSTANCE.factsPhi().clone();
         }
         return this.factsPhi.clone();
+    }
+    public int lastUnsafeChunk() {
+        return this.lastUnsafeChunk;
     }
 }

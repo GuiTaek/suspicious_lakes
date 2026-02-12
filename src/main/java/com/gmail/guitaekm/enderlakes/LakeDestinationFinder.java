@@ -273,7 +273,24 @@ public class LakeDestinationFinder {
         return pos(config, seed, pos.x, pos.y);
     }
 
+    public static boolean isSafeChunk(ChunkPos pos) {
+        return Math.abs(pos.x) > 64 || Math.abs(pos.z) > 64;
+    }
+
     public static GridPos getRawGridPos(ConfigInstance config, ChunkPos pos) {
+        if (!LakeDestinationFinder.isSafeChunk(pos)) {
+            if (Math.abs(pos.x) > Math.abs(pos.z)) {
+                int signum = Integer.compare(pos.x, 0);
+                pos = new ChunkPos(config.lastUnsafeChunk() * signum, pos.z);
+            } else {
+                int signum = Integer.compare(pos.z, 0);
+                pos = new ChunkPos(pos.x, config.lastUnsafeChunk() * signum);
+            }
+        }
+        return getRawGridPosUnsafe(config, pos);
+    }
+
+    private static GridPos getRawGridPosUnsafe(ConfigInstance config, ChunkPos pos) {
         return new GridPos(fInv(config, pos.x), fInv(config, pos.z));
     }
 
@@ -285,7 +302,7 @@ public class LakeDestinationFinder {
         for (int xDiff = -2; xDiff <= +2; xDiff++) {
             for (int yDiff = -2; yDiff <= +2; yDiff++) {
                 GridPos currGridPos = new GridPos(basePos.x + xDiff, basePos.y + yDiff);
-                // todo: better test for zero instead of catching an error
+                // todo: better test for unsafe Chunk instead of catching an error
                 try {
                     rawPos(config, currGridPos);
                 } catch (IllegalArgumentException exc) {
@@ -445,6 +462,12 @@ public class LakeDestinationFinder {
         return primeFactors(n).size() == 1;
     }
 
+    public static int lastUnsafeInteger(ConfigInstance config) {
+        int coord = config.lastUnsafeChunk();
+        ChunkPos pos = new ChunkPos(coord, -coord);
+        return cInv(getRawGridPosUnsafe(config, pos));
+    }
+
     public static GridPos teleportAim(
             ConfigInstance config,
             GridPos oldPos,
@@ -452,8 +475,9 @@ public class LakeDestinationFinder {
             int gInv
     ) {
         assert modularMultiplicationByDoubling(g, gInv, config.nrLakes()) == 1;
-        int number = modularMultiplicationByDoubling(g, cInv(oldPos), config.nrLakes());
-        int mappedNumber = modularMultiplicationByDoubling(gInv, pi(number, config), config.nrLakes());
+        int o = lastUnsafeInteger(config);
+        int number = modularMultiplicationByDoubling(g, cInv(oldPos) - o, config.nrLakes());
+        int mappedNumber = modularMultiplicationByDoubling(gInv, pi(number, config), config.nrLakes()) + o;
         return c(mappedNumber);
     }
     public static ChunkPos teleportAim(
