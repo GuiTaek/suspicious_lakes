@@ -254,6 +254,25 @@ public class TestLakeDestinationFinder {
         }
     }
 
+    public void testFInvRawIntegerWhenCeilIsEqual(ConfigInstance config) {
+        // this test was somehow difficult to craft and catches a bug I had in f
+        Random random = new Random(42);
+        for (int i = 0; i < 100; i++) {
+            int val = random.nextInt(10_000);
+            int processedValue = LakeDestinationFinder.f(config, LakeDestinationFinder.fInvCeil(config, val));
+
+            // in words: when val == f(fInvCeil(val)), fInvRaw(val) must be integer
+            assert processedValue != val || LakeDestinationFinder.fInvRaw(config, val) % 1 == 0.0;
+        }
+    }
+
+    @Test
+    public void testFInvRawIntegerWhenCeilIsEqual() {
+        testFInvRawIntegerWhenCeilIsEqual(CONFIG);
+        testFInvRawIntegerWhenCeilIsEqual(MIDDLE_CONFIG);
+        testFInvRawIntegerWhenCeilIsEqual(smallPrimeConfig);
+    }
+
     @Test
     public void fInvFloorBelowF() {
         for (int c = -350; c <= 350; c++) {

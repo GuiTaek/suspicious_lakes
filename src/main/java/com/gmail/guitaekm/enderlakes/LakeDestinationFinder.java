@@ -298,6 +298,10 @@ public class LakeDestinationFinder {
         return new GridPos(fInv(config, pos.x), fInv(config, pos.z));
     }
 
+    private static GridPos getFloorRawGridUnsafe(ConfigInstance config, ChunkPos pos) {
+        return new GridPos(fInvFloor(config, pos.x), fInvFloor(config, pos.z));
+    }
+
     public static Set<GridPos> findNearestLake(ConfigInstance config, long seed, ChunkPos pos) {
         GridPos basePos = getRawGridPos(config, pos);
         int nearestDistanceSquared = Integer.MAX_VALUE;
@@ -469,7 +473,7 @@ public class LakeDestinationFinder {
     public static int lastUnsafeInteger(ConfigInstance config) {
         int coord = config.lastUnsafeChunk();
         ChunkPos pos = lastPos(config, new ChunkPos(coord, coord));
-        return cInv(getRawGridPosUnsafe(config, pos));
+        return cInv(getFloorRawGridUnsafe(config, pos));
     }
 
     public static ChunkPos lastPos(ConfigInstance config, ChunkPos unRotated) {
