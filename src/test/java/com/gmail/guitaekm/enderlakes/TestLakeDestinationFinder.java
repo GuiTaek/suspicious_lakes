@@ -232,10 +232,10 @@ public class TestLakeDestinationFinder {
                     lastUnsafeChunk
             );
             int o = LakeDestinationFinder.lastUnsafeInteger(config);
-            for (int val = o - 100; val <= o; val++) {
+            for (int val = Math.max(1, o - 100); val <= o; val++) {
                 testInteger(config, val, false);
             }
-            for (int val = o + 100; val <= o; val++) {
+            for (int val = o + 1; val <= o + 100; val++) {
                 testInteger(config, val, true);
             }
         }
