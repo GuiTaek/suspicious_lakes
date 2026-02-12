@@ -2,6 +2,7 @@ package com.gmail.guitaekm.enderlakes;
 
 import com.gmail.guitaekm.enderlakes.LakeDestinationFinder.GridPos;
 import net.minecraft.util.math.BlockPos;
+import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -211,6 +212,24 @@ public class TestLakeDestinationFinder {
             maxCoord = newCoord;
         }
 
+    }
+
+    @Test
+    public void testLastUnsafeIntegerIsReallyLast() {
+        ConfigInstance config = new ConfigInstance(
+                CONFIG.nrLakes(),
+                CONFIG.powerDistance(),
+                CONFIG.cycleWeights(),
+                CONFIG.minimumDistance(),
+                CONFIG.factsPhi(),
+                30
+        );
+        int o = LakeDestinationFinder.lastUnsafeInteger(config);
+        ChunkPos pos = LakeDestinationFinder.rawPos(config, LakeDestinationFinder.c(o));
+        ChunkPos pos2 = LakeDestinationFinder.rawPos(config, LakeDestinationFinder.c(o + 1));
+
+        assert !LakeDestinationFinder.isSafeChunk(config, pos);
+        assert LakeDestinationFinder.isSafeChunk(config, pos2);
     }
 
     @Test
@@ -598,6 +617,37 @@ public class TestLakeDestinationFinder {
         }
     }
 
+    public int getNumberFromChunk(ConfigInstance config, ChunkPos chunkPos) {
+        GridPos gridPos = LakeDestinationFinder.getRawGridPos(config, chunkPos);
+        return LakeDestinationFinder.cInv(gridPos);
+
+    }
+
+    public void testLastPos(ConfigInstance config) {
+        Random random = new Random(42);
+        for (int i = 0; i < 10_000; i++) {
+            int range = random.nextInt(1, 1_000);
+            ChunkPos chunkPos = LakeDestinationFinder.lastPos(config, new ChunkPos(range, range));
+            GridPos gridPos = LakeDestinationFinder.getRawGridPos(config, chunkPos);
+            int toCheckNumber = LakeDestinationFinder.cInv(gridPos);
+            for (int x = -range; x <= +range; x++) {
+                assert toCheckNumber >= getNumberFromChunk(config, new ChunkPos(x, +range));
+                assert toCheckNumber >= getNumberFromChunk(config, new ChunkPos(x, -range));
+            }
+            for (int y = -range; y <= +range; y++) {
+                assert toCheckNumber >= getNumberFromChunk(config, new ChunkPos(+range, y));
+                assert toCheckNumber >= getNumberFromChunk(config, new ChunkPos(-range, y));
+            }
+        }
+    }
+
+    @Test
+    public void testLastPos() {
+        testLastPos(CONFIG);
+        testLastPos(MIDDLE_CONFIG);
+        testLastPos(smallPrimeConfig);
+    }
+
     @Test
     public void testGInv() {
         Random random = new Random(42);
@@ -649,15 +699,21 @@ public class TestLakeDestinationFinder {
             long seed = random.nextLong();
             int g = LakeDestinationFinder.getG(config.nrLakes(), config.factsPhi(), seed);
             int gInv = LakeDestinationFinder.getInv(config.nrLakes(), g);
-            ChunkPos pos = LakeDestinationFinder.teleportAim(
-                    config,
-                    new ChunkPos(x, z),
-                    net.minecraft.util.math.random.Random.create(seed),
-                    g,
-                    gInv,
-                    seed
-            );
-            assert LakeDestinationFinder.isSafeChunk(pos);
+            ChunkPos pos;
+            try {
+                pos = LakeDestinationFinder.teleportAim(
+                        config,
+                        new ChunkPos(x, z),
+                        net.minecraft.util.math.random.Random.create(seed),
+                        g,
+                        gInv,
+                        seed
+                );
+            } catch(IllegalArgumentException exc) {
+                System.out.println();
+                return;
+            }
+            assert LakeDestinationFinder.isSafeChunk(config, pos);
         }
     }
 

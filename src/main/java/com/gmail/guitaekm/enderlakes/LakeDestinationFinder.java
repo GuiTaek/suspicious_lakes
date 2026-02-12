@@ -168,7 +168,7 @@ public class LakeDestinationFinder {
     public static int findNewNrLakes(ConfigInstance config, int border, int signum) {
         assert Math.abs(signum) == 1;
         // this is the position of the last raw Pos, therefore approximately the last lake
-        ChunkPos maxChunk = new ChunkPos(new BlockPos(border / 2, 0, -border / 2));
+        ChunkPos maxChunk = lastPos(config, new ChunkPos(new BlockPos(border / 2, 0, border / 2)));
 
         GridPos gridPos = signum == -1 ? new GridPos(fInvFloor(config, maxChunk.x), fInvFloor(config, maxChunk.z))
                 : new GridPos(fInvCeil(config, maxChunk.x), fInvCeil(config, maxChunk.z));
@@ -190,9 +190,8 @@ public class LakeDestinationFinder {
      */
     public static ChunkPos rawPos(ConfigInstance config, int x, int y) {
         ChunkPos res = new ChunkPos(f(config, x), f(config, y));
-        if (-64 <= res.x && res.x <= +64
-                && -64 <= res.z && res.z <= +64) {
-            throw new IllegalArgumentException("rawPos got a pos in the 128x128 chunks of the start island");
+        if (!isSafeChunk(config, res)) {
+            throw new IllegalArgumentException("rawPos got a non safe pos: %s".formatted(res.toString()));
         }
         return res;
     }
@@ -273,12 +272,12 @@ public class LakeDestinationFinder {
         return pos(config, seed, pos.x, pos.y);
     }
 
-    public static boolean isSafeChunk(ChunkPos pos) {
-        return Math.abs(pos.x) > 64 || Math.abs(pos.z) > 64;
+    public static boolean isSafeChunk(ConfigInstance config, ChunkPos pos) {
+        return Math.abs(pos.x) > config.lastUnsafeChunk() || Math.abs(pos.z) > config.lastUnsafeChunk();
     }
 
     public static GridPos getRawGridPos(ConfigInstance config, ChunkPos pos) {
-        if (!LakeDestinationFinder.isSafeChunk(pos)) {
+        if (!LakeDestinationFinder.isSafeChunk(config, pos)) {
             if (Math.abs(pos.x) > Math.abs(pos.z)) {
                 int signum = Integer.compare(pos.x, 0);
                 pos = new ChunkPos(config.lastUnsafeChunk() * signum, pos.z);
@@ -464,8 +463,13 @@ public class LakeDestinationFinder {
 
     public static int lastUnsafeInteger(ConfigInstance config) {
         int coord = config.lastUnsafeChunk();
-        ChunkPos pos = new ChunkPos(coord, -coord);
+        ChunkPos pos = lastPos(config, new ChunkPos(coord, coord));
         return cInv(getRawGridPosUnsafe(config, pos));
+    }
+
+    public static ChunkPos lastPos(ConfigInstance config, ChunkPos unRotated) {
+        assert Math.abs(unRotated.x) == Math.abs(unRotated.z);
+        return new ChunkPos(Math.abs(unRotated.x), -Math.abs(unRotated.z));
     }
 
     public static GridPos teleportAim(
@@ -480,6 +484,7 @@ public class LakeDestinationFinder {
         int mappedNumber = modularMultiplicationByDoubling(gInv, pi(number, config), config.nrLakes()) + o;
         return c(mappedNumber);
     }
+
     public static ChunkPos teleportAim(
                 ConfigInstance config,
                 ChunkPos oldPos,
