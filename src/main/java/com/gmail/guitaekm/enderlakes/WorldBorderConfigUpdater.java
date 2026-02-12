@@ -13,8 +13,8 @@ public class WorldBorderConfigUpdater implements WorldBorderListener {
 
     public static WorldBorderConfigUpdater INSTANCE = new WorldBorderConfigUpdater();
     private LocalDateTime borderFinished;
-    private double size = -1;
-    private double oldSize;
+    private double size;
+    private double oldSize = -1;
     private int nrLakes;
     private int[] factsPhi;
 
@@ -71,7 +71,7 @@ public class WorldBorderConfigUpdater implements WorldBorderListener {
 
     @Override
     public void onSizeChange(WorldBorder border, double size) {
-        // doesn't seem to be fired
+        this.size = size;
     }
 
     @Override
