@@ -592,7 +592,7 @@ public class TestLakeDestinationFinder {
                     int lastLake = nrLakes - 1;
                     ChunkPos lastChunk = LakeDestinationFinder.rawPos(config, LakeDestinationFinder.c(lastLake));
                     BlockPos lastPos = lastChunk.getBlockPos(8, 0, 8);
-                    assert Math.abs(lastPos.getX()) > border / 2 || Math.abs(lastPos.getY()) > border / 2;
+                    assert Math.abs(lastPos.getX()) > border / 2 || Math.abs(lastPos.getZ()) > border / 2;
                 }
             }
         }
