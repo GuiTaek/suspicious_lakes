@@ -214,22 +214,31 @@ public class TestLakeDestinationFinder {
 
     }
 
+    public void testInteger(ConfigInstance config, int val, boolean isSafe) {
+        GridPos gPos = LakeDestinationFinder.c(val);
+        ChunkPos pos = LakeDestinationFinder.rawPosUnsafe(config, gPos.x(), gPos.y());
+        assert isSafe == LakeDestinationFinder.isSafeChunk(config, pos);
+    }
+
     @Test
     public void testLastUnsafeIntegerIsReallyLast() {
-        ConfigInstance config = new ConfigInstance(
-                CONFIG.nrLakes(),
-                CONFIG.powerDistance(),
-                CONFIG.cycleWeights(),
-                CONFIG.minimumDistance(),
-                CONFIG.factsPhi(),
-                30
-        );
-        int o = LakeDestinationFinder.lastUnsafeInteger(config);
-        ChunkPos pos = LakeDestinationFinder.rawPos(config, LakeDestinationFinder.c(o));
-        ChunkPos pos2 = LakeDestinationFinder.rawPos(config, LakeDestinationFinder.c(o + 1));
-
-        assert !LakeDestinationFinder.isSafeChunk(config, pos);
-        assert LakeDestinationFinder.isSafeChunk(config, pos2);
+        for (int lastUnsafeChunk = 10; lastUnsafeChunk < 100; lastUnsafeChunk++) {
+            ConfigInstance config = new ConfigInstance(
+                    CONFIG.nrLakes(),
+                    CONFIG.powerDistance(),
+                    CONFIG.cycleWeights(),
+                    CONFIG.minimumDistance(),
+                    CONFIG.factsPhi(),
+                    lastUnsafeChunk
+            );
+            int o = LakeDestinationFinder.lastUnsafeInteger(config);
+            for (int val = o - 100; val <= o; val++) {
+                testInteger(config, val, false);
+            }
+            for (int val = o + 100; val <= o; val++) {
+                testInteger(config, val, true);
+            }
+        }
     }
 
     @Test
@@ -699,9 +708,7 @@ public class TestLakeDestinationFinder {
             long seed = random.nextLong();
             int g = LakeDestinationFinder.getG(config.nrLakes(), config.factsPhi(), seed);
             int gInv = LakeDestinationFinder.getInv(config.nrLakes(), g);
-            ChunkPos pos;
-            try {
-                pos = LakeDestinationFinder.teleportAim(
+            ChunkPos pos = LakeDestinationFinder.teleportAim(
                         config,
                         new ChunkPos(x, z),
                         net.minecraft.util.math.random.Random.create(seed),
@@ -709,10 +716,6 @@ public class TestLakeDestinationFinder {
                         gInv,
                         seed
                 );
-            } catch(IllegalArgumentException exc) {
-                System.out.println();
-                return;
-            }
             assert LakeDestinationFinder.isSafeChunk(config, pos);
         }
     }

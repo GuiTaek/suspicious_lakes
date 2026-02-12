@@ -196,6 +196,11 @@ public class LakeDestinationFinder {
         return res;
     }
 
+    public static ChunkPos rawPosUnsafe(ConfigInstance config, int x, int y) {
+        ChunkPos res = new ChunkPos(f(config, x), f(config, y));
+        return res;
+    }
+
     /**
      * in math.md, it's rawPos
      * @param config a config instance e.g. self defined through ConfigInstance or defined through the player
