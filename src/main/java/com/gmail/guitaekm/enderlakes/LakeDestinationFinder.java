@@ -17,7 +17,7 @@ import java.util.function.Function;
  */
 @SuppressWarnings("SuspiciousNameCombination")
 public class LakeDestinationFinder {
-    final private ConfigInstance config;
+    final public ConfigInstance config;
     public LakeDestinationFinder(ConfigInstance config) {
         this.config = config;
     }

@@ -22,36 +22,26 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestLakeDestinationFinder {
     public static final Logger LOGGER = LoggerFactory.getLogger("lake_destination_tester");
+
+    final private static ConfigInstance NORMAL_CONFIG =  new ConfigInstance();
+
+    final private static ConfigInstance MIDDLE_CONFIG = new ConfigInstance(
+            ConfigInstance.borderSource(30_000),
+            NORMAL_CONFIG.powerDistance(),
+            NORMAL_CONFIG.cycleWeights(),
+            NORMAL_CONFIG.minimumDistance(),
+            900
+    );
+
     static ConfigInstance SMALL_CONFIG = new ConfigInstance(
-            19,
+            ConfigInstance.rawSource(19),
             ConfigValues.powerDistance,
             List.of(
                     1, 4, 3, 4, 0, 6
             ),
             ConfigValues.minimumDistance,
-            new int[] {2, 3, 3},
             100
     );
-    final private static ConfigInstance NORMAL_CONFIG =  new ConfigInstance();
-
-    static {
-        LakeDestinationFinder finder = new LakeDestinationFinder(NORMAL_CONFIG);
-        int nrLakes = finder.findNewNrLakes(30_000, -1);
-        int[] factsPhi = LakeDestinationFinder.primeFactors(nrLakes - 1)
-                .stream()
-                .mapToInt(i -> i)
-                .toArray();
-
-        MIDDLE_CONFIG = new ConfigInstance(
-                nrLakes,
-                NORMAL_CONFIG.powerDistance(),
-                NORMAL_CONFIG.cycleWeights(),
-                NORMAL_CONFIG.minimumDistance(),
-                factsPhi,
-                4_000
-        );
-    }
-    final private static ConfigInstance MIDDLE_CONFIG;
 
     @Test
     public void testPi() {
@@ -226,11 +216,10 @@ public class TestLakeDestinationFinder {
     public void testLastUnsafeIntegerIsReallyLast() {
         for (int lastUnsafeChunk = 10; lastUnsafeChunk < 100; lastUnsafeChunk++) {
             ConfigInstance config = new ConfigInstance(
-                    NORMAL_CONFIG.nrLakes(),
+                    ConfigInstance.rawSource(NORMAL_CONFIG.nrLakes()),
                     NORMAL_CONFIG.powerDistance(),
                     NORMAL_CONFIG.cycleWeights(),
                     NORMAL_CONFIG.minimumDistance(),
-                    NORMAL_CONFIG.factsPhi(),
                     lastUnsafeChunk
             );
             int o = new LakeDestinationFinder(config).lastUnsafeInteger();
@@ -255,11 +244,10 @@ public class TestLakeDestinationFinder {
 
     public ConfigInstance configTransformer(ConfigInstance config, int lastUnsafeChunk) {
         return new ConfigInstance(
-                config.nrLakes(),
+                ConfigInstance.rawSource(config.nrLakes()),
                 config.powerDistance(),
                 config.cycleWeights(),
                 config.minimumDistance(),
-                config.factsPhi(),
                 lastUnsafeChunk
         );
     }

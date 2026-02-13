@@ -1,75 +1,96 @@
 package com.gmail.guitaekm.enderlakes;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ConfigInstance {
 
-    final private int nrLakes;
     final private double powerDistance;
     final private List<Integer> cycleWeights;
     final private int minimumDistance;
-    final private int[] factsPhi;
-    final private boolean autoUpdate;
     final private int lastUnsafeChunk;
+
+    private int nrLakes;
+    private int[] factsPhi;
+    private boolean sourceChanged;
+    private NrLakesSource nrLakesSource;
+
+    public enum NrLakesSourceType {
+        RAW,
+        BORDER
+    }
+
+    public record NrLakesSource(NrLakesSourceType type, int val) { }
+
+    public static NrLakesSource borderSource(int border) {
+        return new NrLakesSource(NrLakesSourceType.BORDER, border);
+    }
+
+    public static NrLakesSource rawSource(int nrLakes) {
+        assert BigInteger.valueOf(nrLakes).isProbablePrime(1_000);
+        return new NrLakesSource(NrLakesSourceType.RAW, nrLakes);
+    }
 
     public ConfigInstance() {
         this(
-                ConfigValues.nrLakes,
+                rawSource(ConfigValues.nrLakes),
                 ConfigValues.powerDistance,
                 ConfigValues.cycleWeights,
                 ConfigValues.minimumDistance,
-                ConfigValues.factsPhi,
-                ConfigValues.lastUnsafeChunkCoord,
-                // todo: change to true, when the dependencies are inverted
-                // it can't be changed now because else the test needs to load Enderlakes which crashes the tests
-                false
+                ConfigValues.lastUnsafeChunkCoord
         );
     }
-    public ConfigInstance(
-            int nrLakes,
+    public ConfigInstance (
+            NrLakesSource nrLakesSource,
             double powerDistance,
             List<Integer> cycleWeights,
             int minimumDistance,
-            int[] factsPhi,
             int lastUnsafeChunk
     ) {
-        this(nrLakes, powerDistance, cycleWeights, minimumDistance, factsPhi, lastUnsafeChunk, false);
-    }
-    private ConfigInstance (
-            int nrLakes,
-            double powerDistance,
-            List<Integer> cycleWeights,
-            int minimumDistance,
-            int[] factsPhi,
-            int lastUnsafeChunk,
-            boolean autoUpdate
-    ) {
-        this.nrLakes = nrLakes;
         this.powerDistance = powerDistance;
         this.cycleWeights = new ArrayList<>(cycleWeights);
         this.minimumDistance = minimumDistance;
-        this.factsPhi = factsPhi;
         this.lastUnsafeChunk = lastUnsafeChunk;
-        this.autoUpdate = autoUpdate;
+
+        this.nrLakesSource = nrLakesSource;
+        this.sourceChanged = true;
+        this.updateNrLakesAndFactsPhi();
     }
 
-    public ConfigInstance autoupdated() {
-        return new ConfigInstance(
-                this.nrLakes,
-                this.powerDistance,
-                this.cycleWeights,
-                this.minimumDistance,
-                this.factsPhi,
-                this.lastUnsafeChunk,
-                true
-        );
+    private void updateNrLakesAndFactsPhi() {
+        if (!this.sourceChanged) {
+            return;
+        }
+        switch (this.nrLakesSource.type) {
+            case RAW -> {
+                this.nrLakes = this.nrLakesSource.val;
+            }
+            case BORDER -> {
+                LakeDestinationFinder finder = new LakeDestinationFinder(this);
+                this.nrLakes = finder.findNewNrLakes(this.nrLakesSource.val, -1);
+            }
+        }
+        this.factsPhi = LakeDestinationFinder
+                .primeFactors(this.nrLakes - 1)
+                .stream()
+                .mapToInt(elem -> elem)
+                .toArray();
+        this.sourceChanged = false;
+    }
+
+    public void setNrLakesSource(NrLakesSource source) {
+        if (this.nrLakesSource.type == source.type) {
+            if (this.nrLakesSource.val == source.val) {
+                return;
+            }
+        }
+        this.nrLakesSource = source;
+        this.sourceChanged = true;
     }
 
     public int nrLakes() {
-        if (this.autoUpdate) {
-            return WorldBorderConfigUpdater.INSTANCE.nrLakes();
-        }
+        this.updateNrLakesAndFactsPhi();
         return this.nrLakes;
     }
     public double powerDistance() {
@@ -82,9 +103,7 @@ public class ConfigInstance {
         return this.minimumDistance;
     }
     public int[] factsPhi() {
-        if (this.autoUpdate) {
-            return WorldBorderConfigUpdater.INSTANCE.factsPhi().clone();
-        }
+        this.updateNrLakesAndFactsPhi();
         return this.factsPhi.clone();
     }
     public int lastUnsafeChunk() {
