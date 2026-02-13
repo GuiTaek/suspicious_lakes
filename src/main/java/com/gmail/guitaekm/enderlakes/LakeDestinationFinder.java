@@ -23,13 +23,15 @@ public class LakeDestinationFinder {
     }
 
     public int pi(int i) {
+        assert i > 0;
         int weightSum = config.cycleWeights().stream().mapToInt(w -> w).sum();
         int[] nrLakesPerCycle = config.cycleWeights()
                 .stream()
                 .mapToDouble(w -> (double) w / weightSum)
-                .mapToInt(p -> (int) Math.round(config.nrLakes() * p))
+                // floor so we safeguard overflow
+                .mapToInt(p -> (int) Math.floor((config.nrLakes() - 1) * p))
                 .toArray();
-        int unUsedCycles = i;
+        int unUsedCycles = i - 1;
         for (int cycleLength = 1; cycleLength <= nrLakesPerCycle.length; cycleLength++) {
             unUsedCycles -= nrLakesPerCycle[cycleLength - 1];
             if (unUsedCycles < 0) {

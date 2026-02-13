@@ -56,18 +56,18 @@ public class TestLakeDestinationFinder {
     @Test
     public void testPi() {
         List<Integer> piIVals = List.of(
-                0,
+                1,
 
-                2, 1,
-                4, 3,
+                3, 2,
+                5, 4,
 
-                6, 7, 5,
+                7, 8, 6,
 
-                9, 10, 11, 8,
+                10, 11, 12, 9,
 
-                13, 14, 15, 16, 17, 12
+                14, 15, 16, 17, 18, 13
         );
-        int ind = 0;
+        int ind = 1;
         for (Integer piI : piIVals) {
             LakeDestinationFinder finder = new LakeDestinationFinder(smallPrimeConfig);
             assertEquals(piI, finder.pi(ind++));
