@@ -586,19 +586,9 @@ public class LakeDestinationFinder {
         return currPos;
     }
 
-    private static int g;
-    private static Long lastSeed = null;
-
-    public static int getG(int N, int[] factsPhi, long seed) {
-        if (!Objects.equals(seed, lastSeed)) {
-            LakeDestinationFinder.g = calculateG(N, factsPhi, seed);
-            LakeDestinationFinder.lastSeed = seed;
-        }
-        return LakeDestinationFinder.g;
-    }
-
     public static int calculateG(int N, int[] factsPhi, long seed) {
         Random random = new LocalRandom(seed);
+        int g;
         do {
             g = random.nextBetween(1, N - 1);
         } while (!isPrimitiveRootFast(g, N, factsPhi));

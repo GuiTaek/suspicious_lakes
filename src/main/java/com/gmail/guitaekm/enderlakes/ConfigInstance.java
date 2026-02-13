@@ -120,7 +120,7 @@ public class ConfigInstance {
     }
     public void updateG() {
         if (!Objects.equals(this.oldSeed, this.seed) || !Objects.equals(this.oldNrLakes, this.nrLakes())) {
-            this.g = LakeDestinationFinder.getG(this.nrLakes(), this.factsPhi(), this.seed);
+            this.g = LakeDestinationFinder.calculateG(this.nrLakes(), this.factsPhi(), this.seed);
             this.gInv = LakeDestinationFinder.calculateInv(this.nrLakes(), this.g);
             this.oldSeed = this.seed;
             this.oldNrLakes = this.nrLakes();

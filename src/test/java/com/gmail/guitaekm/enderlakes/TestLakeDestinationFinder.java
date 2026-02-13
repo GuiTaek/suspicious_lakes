@@ -795,7 +795,7 @@ public class TestLakeDestinationFinder {
     }
 
     public void testGIsPrimitiveRoot(ConfigInstance config, long seed) {
-        int g = LakeDestinationFinder.getG(NORMAL_CONFIG.nrLakes(), NORMAL_CONFIG.factsPhi(), seed);
+        int g = LakeDestinationFinder.calculateG(NORMAL_CONFIG.nrLakes(), NORMAL_CONFIG.factsPhi(), seed);
         assert LakeDestinationFinder.isPrimitiveRootFast(g, NORMAL_CONFIG.nrLakes(), NORMAL_CONFIG.factsPhi());
     }
 
@@ -825,8 +825,8 @@ public class TestLakeDestinationFinder {
                 z = temp;
             }
             long seed = random.nextLong();
-            int g = LakeDestinationFinder.getG(config.nrLakes(), config.factsPhi(), seed);
-            int gInv = LakeDestinationFinder.getInv(config.nrLakes(), g);
+            int g = LakeDestinationFinder.calculateG(config.nrLakes(), config.factsPhi(), seed);
+            int gInv = LakeDestinationFinder.calculateInv(config.nrLakes(), g);
             ChunkPos pos = finder.teleportAim(
                         new ChunkPos(x, z),
                         net.minecraft.util.math.random.Random.create(seed),
