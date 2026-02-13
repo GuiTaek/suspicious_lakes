@@ -690,8 +690,7 @@ public class TestLakeDestinationFinder {
 
     @Test
     public void testFindNewLakes() {
-        // todo: add MIDDLE_CONFIG
-        for (ConfigInstance config : List.of(smallPrimeConfig, CONFIG)) {
+        for (ConfigInstance config : List.of(smallPrimeConfig, MIDDLE_CONFIG, CONFIG)) {
             LakeDestinationFinder finder = new LakeDestinationFinder(config);
             for (int border = 5_000; border <= 100_000; border += 1_000) {
                 {
