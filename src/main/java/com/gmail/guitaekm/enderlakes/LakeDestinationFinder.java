@@ -17,7 +17,12 @@ import java.util.function.Function;
  */
 @SuppressWarnings("SuspiciousNameCombination")
 public class LakeDestinationFinder {
-    public static int pi(int i, ConfigInstance config) {
+    final private ConfigInstance config;
+    public LakeDestinationFinder(ConfigInstance config) {
+        this.config = config;
+    }
+
+    public int pi(int i) {
         int weightSum = config.cycleWeights().stream().mapToInt(w -> w).sum();
         int[] nrLakesPerCycle = config.cycleWeights()
                 .stream()
@@ -132,61 +137,60 @@ public class LakeDestinationFinder {
         return cInv(new GridPos(x, y));
     }
 
-    public static int fRound(ConfigInstance config, int c) {
+    public int fRound(int c) {
         int signum = Integer.compare(c, 0);
-        return signum * (int) Math.round(signum * fRaw(config, c));
+        return signum * (int) Math.round(signum * fRaw(c));
     }
 
-    public static int fCeil(ConfigInstance config, int c) {
+    public int fCeil(int c) {
         int signum = Integer.compare(c, 0);
-        return signum * (int) Math.ceil(signum * fRaw(config, c));
+        return signum * (int) Math.ceil(signum * fRaw(c));
     }
 
-    public static int fFloor(ConfigInstance config, int c) {
+    public int fFloor(int c) {
         int signum = Integer.compare(c, 0);
-        return signum * (int) Math.floor(signum * fRaw(config, c));
+        return signum * (int) Math.floor(signum * fRaw(c));
     }
 
-    public static double fRaw(ConfigInstance config, int c) {
+    public double fRaw(int c) {
         int signum = Integer.compare(c, 0);
         return signum * config.minimumDistance() * Math.pow(Math.abs(c), config.powerDistance());
     }
 
-    public static double fInvRaw(ConfigInstance config, int c) {
+    public double fInvRaw(int c) {
         int signum = Integer.compare(c, 0);
         return signum * Math.pow((double) Math.abs(c) / config.minimumDistance(), 1d / config.powerDistance());
     }
 
-    public static int fInv(ConfigInstance config, int c) {
-        return (int) Math.round(fInvRaw(config, c));
+    public int fInv(int c) {
+        return (int) Math.round(fInvRaw(c));
     }
 
-    public static int fInvFloor(ConfigInstance config, int c) {
+    public int fInvFloor(int c) {
         int signum = Integer.compare(c, 0);
-        return signum * (int) Math.floor(signum * fInvRaw(config, c));
+        return signum * (int) Math.floor(signum * fInvRaw(c));
     }
 
-    public static int fInvCeil(ConfigInstance config, int c) {
+    public int fInvCeil(int c) {
         int signum = Integer.compare(c, 0);
-        return signum * (int) Math.ceil(signum * fInvRaw(config, c));
+        return signum * (int) Math.ceil(signum * fInvRaw(c));
     }
 
     /**
      * generates a prime needed for this whole math depending on the world border
-     * @param config the config for which the prime number will be generated. nrLakes and factsPhi will be ignored
      * @param border the distance in x or z direction from the border to spawn
      * @param signum the direction the prime is searched in (positive or negative). Must be -1 or 1. If positive,
      *               there might be some lake cycles on the map that have one or unlikely more than one lake removed.
      *               Can lead to lakes pointing on themselves. If negative, the last lakes of the map may be one-directional
      * @return the new prime
      */
-    public static int findNewNrLakes(ConfigInstance config, int border, int signum) {
+    public int findNewNrLakes(int border, int signum) {
         assert Math.abs(signum) == 1;
         // this is the position of the last raw Pos, therefore approximately the last lake
-        ChunkPos maxChunk = lastPos(config, new ChunkPos(new BlockPos(border / 2, 0, border / 2)));
+        ChunkPos maxChunk = lastPos(new ChunkPos(new BlockPos(border / 2, 0, border / 2)));
 
-        GridPos gridPos = signum == -1 ? new GridPos(fInvFloor(config, maxChunk.x), fInvFloor(config, maxChunk.z))
-                : new GridPos(fInvCeil(config, maxChunk.x), fInvCeil(config, maxChunk.z));
+        GridPos gridPos = signum == -1 ? new GridPos(fInvFloor(maxChunk.x), fInvFloor(maxChunk.z))
+                : new GridPos(fInvCeil(maxChunk.x), fInvCeil(maxChunk.z));
         BigInteger prime = BigInteger.valueOf(cInv(gridPos));
         while (!prime.isProbablePrime(1_000)) {
             prime = prime.add(BigInteger.valueOf(signum));
@@ -198,57 +202,54 @@ public class LakeDestinationFinder {
 
     /**
      * in math.md, it's rawPos
-     * @param config a config instance e.g. self defined through ConfigInstance or defined through the player
      * @param x grid x coordinate
      * @param y grid y coordinate
      * @return the chunk position that the grid position relates to in the minecraft world
      */
-    public static ChunkPos rawPos(ConfigInstance config, int x, int y) {
-        ChunkPos res = new ChunkPos(fRound(config, x), fRound(config, y));
-        if (!isSafeChunk(config, res)) {
+    public ChunkPos rawPos(int x, int y) {
+        ChunkPos res = new ChunkPos(fRound(x), fRound(y));
+        if (!isSafeChunk(res)) {
             throw new IllegalArgumentException("rawPos got a non safe pos: %s".formatted(res.toString()));
         }
         return res;
     }
 
-    public static ChunkPos rawPosUnsafe(ConfigInstance config, GridPos pos) {
-        return rawPosUnsafe(config, pos.x, pos.y);
+    public ChunkPos rawPosUnsafe(GridPos pos) {
+        return rawPosUnsafe(pos.x, pos.y);
     }
 
-    public static ChunkPos rawPosUnsafe(ConfigInstance config, int x, int y) {
-        ChunkPos res = new ChunkPos(fRound(config, x), fRound(config, y));
+    public ChunkPos rawPosUnsafe(int x, int y) {
+        ChunkPos res = new ChunkPos(fRound(x), fRound(y));
         return res;
     }
 
-    public static ChunkPos rawPosCeilUnsafe(ConfigInstance config, GridPos pos) {
-        ChunkPos res = new ChunkPos(fCeil(config, pos.x), fCeil(config, pos.y));
+    public ChunkPos rawPosCeilUnsafe(GridPos pos) {
+        ChunkPos res = new ChunkPos(fCeil(pos.x), fCeil(pos.y));
         return res;
     }
 
-    public static ChunkPos rawPosFloorUnsafe(ConfigInstance config, GridPos pos) {
-        ChunkPos res = new ChunkPos(fFloor(config, pos.x), fFloor(config, pos.y));
+    public ChunkPos rawPosFloorUnsafe(GridPos pos) {
+        ChunkPos res = new ChunkPos(fFloor(pos.x), fFloor(pos.y));
         return res;
     }
 
     /**
      * in math.md, it's rawPos
-     * @param config a config instance e.g. self defined through ConfigInstance or defined through the player
      * @param gridCoords the coordinates in the grid not really being chunk coordinates
      * @return the chunk position that the grid position relates to in the minecraft world
      */
-    public static ChunkPos rawPos(ConfigInstance config, GridPos gridCoords) {
-        return rawPos(config, gridCoords.x, gridCoords.y);
+    public ChunkPos rawPos(GridPos gridCoords) {
+        return rawPos(gridCoords.x, gridCoords.y);
     }
 
     /**
      * in maths.md it's pos + off
-     * @param config a config instance e.g. self defined through ConfigInstance or defined through the player
      * @param seed the seed of the world or the random generator if not used in a minecraft setting
      * @param x the grid x position
      * @param y the grid y position
      * @return the chunk where the lake should lie in
      */
-    public static ChunkPos pos(ConfigInstance config, long seed, int x, int y) {
+    public ChunkPos pos(long seed, int x, int y) {
         if (x == 0 && y == 0) {
             throw new IllegalArgumentException("off shall not get the origin");
         }
@@ -257,38 +258,38 @@ public class LakeDestinationFinder {
         {
             ChunkPos fromPos;
             try {
-                fromPos = rawPos(config, x, y - 1);
-                rawPos(config, x - 1, y - 1);
-                rawPos(config, x + 1, y - 1);
+                fromPos = rawPos(x, y - 1);
+                rawPos(x - 1, y - 1);
+                rawPos(x + 1, y - 1);
             } catch(IllegalArgumentException exc) {
-                fromPos = rawPos(config, x, y);
+                fromPos = rawPos(x, y);
             }
             ChunkPos toPos;
             try {
-                toPos = rawPos(config, x, y + 1);
-                rawPos(config, x - 1, y + 1);
-                rawPos(config, x + 1, y + 1);
+                toPos = rawPos(x, y + 1);
+                rawPos(x - 1, y + 1);
+                rawPos(x + 1, y + 1);
             } catch(IllegalArgumentException exc) {
-                toPos = rawPos(config, x, y);
+                toPos = rawPos(x, y);
             }
             offZ = random.nextBetween(fromPos.z, toPos.z);
         }
         {
             ChunkPos fromPos;
             try {
-                fromPos = rawPos(config, x - 1, y);
-                rawPos(config, x - 1, y - 1);
-                rawPos(config, x - 1, y + 1);
+                fromPos = rawPos(x - 1, y);
+                rawPos(x - 1, y - 1);
+                rawPos(x - 1, y + 1);
             } catch(IllegalArgumentException exc) {
-                fromPos = rawPos(config, x, y);
+                fromPos = rawPos(x, y);
             }
             ChunkPos toPos;
             try {
-                toPos = rawPos(config, x + 1, y);
-                rawPos(config, x + 1, y - 1);
-                rawPos(config, x + 1, y + 1);
+                toPos = rawPos(x + 1, y);
+                rawPos(x + 1, y - 1);
+                rawPos(x + 1, y + 1);
             } catch(IllegalArgumentException exc) {
-                toPos = rawPos(config, x, y);
+                toPos = rawPos(x, y);
             }
             offX = random.nextBetween(fromPos.x, toPos.x);
         }
@@ -297,50 +298,49 @@ public class LakeDestinationFinder {
 
     /**
      *
-     * @param config a config instance e.g. self defined through ConfigInstance or defined through the player
      * @param seed the seed of the world or the random generator if not used in a minecraft setting
      * @param pos the position in the grid
      * @return the chunk where the lake should ly in
      */
-    public static ChunkPos pos(ConfigInstance config, long seed, GridPos pos) {
-        return pos(config, seed, pos.x, pos.y);
+    public ChunkPos pos(long seed, GridPos pos) {
+        return pos(seed, pos.x, pos.y);
     }
 
-    public static boolean isSafeChunk(ConfigInstance config, ChunkPos pos) {
+    public boolean isSafeChunk(ChunkPos pos) {
         return Math.abs(pos.x) > config.lastUnsafeChunk() || Math.abs(pos.z) > config.lastUnsafeChunk();
     }
 
-    public static GridPos getRawGridPos(ConfigInstance config, ChunkPos pos) {
-        GridPos result = getRawGridPosUnsafe(config, pos);
-        ChunkPos worstCasePos = rawPosFloorUnsafe(config, result);
-        if (!LakeDestinationFinder.isSafeChunk(config, worstCasePos)) {
+    public GridPos getRawGridPos(ChunkPos pos) {
+        GridPos result = getRawGridPosUnsafe(pos);
+        ChunkPos worstCasePos = rawPosFloorUnsafe(result);
+        if (!this.isSafeChunk(worstCasePos)) {
             if (Math.abs(pos.x) > Math.abs(pos.z)) {
                 int signum = pos.x >= 0 ? 1 : -1;
                 pos = new ChunkPos((config.lastUnsafeChunk() + 1) * signum, pos.z);
-                result = getCeilRawGridPosUnsafe(config, pos);
+                result = getCeilRawGridPosUnsafe(pos);
             } else {
                 int signum = pos.z >= 0 ? 1 : -1;
                 pos = new ChunkPos(pos.x, (config.lastUnsafeChunk() + 1) * signum);
-                result = getCeilRawGridPosUnsafe(config, pos);
+                result = getCeilRawGridPosUnsafe(pos);
             }
         }
         return result;
     }
 
-    private static GridPos getRawGridPosUnsafe(ConfigInstance config, ChunkPos pos) {
-        return new GridPos(fInv(config, pos.x), fInv(config, pos.z));
+    private GridPos getRawGridPosUnsafe(ChunkPos pos) {
+        return new GridPos(fInv(pos.x), fInv(pos.z));
     }
 
-    private static GridPos getFloorRawGridUnsafe(ConfigInstance config, ChunkPos pos) {
-        return new GridPos(fInvFloor(config, pos.x), fInvFloor(config, pos.z));
+    private GridPos getFloorRawGridUnsafe(ChunkPos pos) {
+        return new GridPos(fInvFloor(pos.x), fInvFloor(pos.z));
     }
 
-    public static GridPos getCeilRawGridPosUnsafe(ConfigInstance config, ChunkPos pos) {
-        return new GridPos(fInvCeil(config, pos.x), fInvCeil(config, pos.z));
+    public GridPos getCeilRawGridPosUnsafe(ChunkPos pos) {
+        return new GridPos(fInvCeil(pos.x), fInvCeil(pos.z));
     }
 
-    public static Set<GridPos> findNearestLake(ConfigInstance config, long seed, ChunkPos pos) {
-        GridPos basePos = getRawGridPos(config, pos);
+    public Set<GridPos> findNearestLake(long seed, ChunkPos pos) {
+        GridPos basePos = getRawGridPos(pos);
         int nearestDistanceSquared = Integer.MAX_VALUE;
         HashSet<GridPos> nearestLake = new HashSet<>();
         // the offset of pos relative to rawPos is inside a 2x2 GridPos-Rectangle, therefore -2 to +2
@@ -349,11 +349,11 @@ public class LakeDestinationFinder {
                 GridPos currGridPos = new GridPos(basePos.x + xDiff, basePos.y + yDiff);
                 // todo: better test for unsafe Chunk instead of catching an error
                 try {
-                    rawPos(config, currGridPos);
+                    rawPos(currGridPos);
                 } catch (IllegalArgumentException exc) {
                     continue;
                 }
-                int currDistanceSquared = pos(config, seed, currGridPos)
+                int currDistanceSquared = pos(seed, currGridPos)
                         .getSquaredDistance(pos);
                 if (currDistanceSquared == nearestDistanceSquared) {
                     nearestLake.add(currGridPos);
@@ -507,42 +507,40 @@ public class LakeDestinationFinder {
         return primeFactors(n).size() == 1;
     }
 
-    public static int lastUnsafeInteger(ConfigInstance config) {
+    public int lastUnsafeInteger() {
         int coord = config.lastUnsafeChunk();
         GridPos offset = new GridPos(0, 0);
-        if (fRound(config, fInvCeil(config, config.lastUnsafeChunk())) == config.lastUnsafeChunk() ) {
+        if (fRound(fInvCeil(config.lastUnsafeChunk())) == config.lastUnsafeChunk() ) {
             // probably need a new function for that
             offset = new GridPos(1, -1);
         }
-        ChunkPos pos = lastPos(config, new ChunkPos(coord, coord));
-        GridPos rawLastPos = getFloorRawGridUnsafe(config, pos);
+        ChunkPos pos = lastPos(new ChunkPos(coord, coord));
+        GridPos rawLastPos = getFloorRawGridUnsafe(pos);
         return cInv(new GridPos(rawLastPos.x + offset.x, rawLastPos.y + offset.y));
     }
 
-    public static ChunkPos lastPos(ConfigInstance config, ChunkPos unRotated) {
+    public ChunkPos lastPos(ChunkPos unRotated) {
         assert Math.abs(unRotated.x) == Math.abs(unRotated.z);
         return new ChunkPos(Math.abs(unRotated.x), -Math.abs(unRotated.z));
     }
 
-    public static GridPos teleportAim(
-            ConfigInstance config,
+    public GridPos teleportAim(
             GridPos oldPos,
             int g,
             int gInv
     ) {
         assert modularMultiplicationByDoubling(g, gInv, config.nrLakes()) == 1;
-        int o = lastUnsafeInteger(config);
+        int o = lastUnsafeInteger();
         int number = modularMultiplicationByDoubling(g, cInv(oldPos) - o, config.nrLakes());
         // when oldPos is very big, there is a small chance (cInv(oldPos) - o) % config.nrLakes() == 0
         if (number == 0) {
             number = 1;
         }
-        int mappedNumber = modularMultiplicationByDoubling(gInv, pi(number, config), config.nrLakes()) + o;
+        int mappedNumber = modularMultiplicationByDoubling(gInv, pi(number), config.nrLakes()) + o;
         return c(mappedNumber);
     }
 
-    public static ChunkPos teleportAim(
-                ConfigInstance config,
+    public ChunkPos teleportAim(
                 ChunkPos oldPos,
                 Random minecraftRandom,
                 int g,
@@ -550,16 +548,15 @@ public class LakeDestinationFinder {
                 long seed
     ) {
         assert isPrimitiveRootFast(g, config.nrLakes(), config.factsPhi());
-        Set<GridPos> gridPositions = LakeDestinationFinder.findNearestLake(config, seed, oldPos);
+        Set<GridPos> gridPositions = this.findNearestLake(seed, oldPos);
         GridPos gridPos = new ArrayList<>(gridPositions).get(
                 (int)(gridPositions.size() * minecraftRandom.nextDouble())
         );
-        return pos(config, seed, teleportAim(config, gridPos, g, gInv));
+        return pos(seed, teleportAim(gridPos, g, gInv));
     }
 
-    public static ChunkPos safeTeleportAim(
+    public ChunkPos safeTeleportAim(
             World world,
-            ConfigInstance config,
             ChunkPos oldPos,
             Random minecraftRandom,
             int g,
@@ -569,7 +566,7 @@ public class LakeDestinationFinder {
         ChunkPos currPos = oldPos;
         int counter = 0;
         do {
-            currPos = teleportAim(config, currPos, minecraftRandom, g, gInv, seed);
+            currPos = teleportAim(currPos, minecraftRandom, g, gInv, seed);
             if (counter > config.cycleWeights().size()) {
                 // some fail-safe if someone enters a lake outside the border and none of the cycle is within
                 return null;

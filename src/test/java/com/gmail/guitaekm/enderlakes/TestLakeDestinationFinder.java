@@ -35,7 +35,8 @@ public class TestLakeDestinationFinder {
     final private static ConfigInstance CONFIG =  new ConfigInstance();
 
     static {
-        int nrLakes = LakeDestinationFinder.findNewNrLakes(CONFIG, 30_000, -1);
+        LakeDestinationFinder finder = new LakeDestinationFinder(CONFIG);
+        int nrLakes = finder.findNewNrLakes(30_000, -1);
         int[] factsPhi = LakeDestinationFinder.primeFactors(nrLakes - 1)
                 .stream()
                 .mapToInt(i -> i)
@@ -67,8 +68,10 @@ public class TestLakeDestinationFinder {
                 13, 14, 15, 16, 17, 12
         );
         int ind = 0;
-        for (Integer piI : piIVals)
-            assertEquals(piI, LakeDestinationFinder.pi(ind++, smallPrimeConfig));
+        for (Integer piI : piIVals) {
+            LakeDestinationFinder finder = new LakeDestinationFinder(smallPrimeConfig);
+            assertEquals(piI, finder.pi(ind++));
+        }
     }
     @Test
     public void testCInjective() {
@@ -214,9 +217,9 @@ public class TestLakeDestinationFinder {
     }
 
     public void testInteger(ConfigInstance config, int val, boolean isSafe) {
+        LakeDestinationFinder finder = new LakeDestinationFinder(config);
         GridPos gPos = LakeDestinationFinder.c(val);
-        ChunkPos pos = LakeDestinationFinder.rawPosUnsafe(config, gPos.x(), gPos.y());
-        assert isSafe == LakeDestinationFinder.isSafeChunk(config, pos);
+        assert isSafe == finder.isSafeChunk(finder.rawPosUnsafe(gPos.x(), gPos.y()));
     }
 
     @Test
@@ -230,7 +233,7 @@ public class TestLakeDestinationFinder {
                     CONFIG.factsPhi(),
                     lastUnsafeChunk
             );
-            int o = LakeDestinationFinder.lastUnsafeInteger(config);
+            int o = new LakeDestinationFinder(config).lastUnsafeInteger();
             for (int val = Math.max(1, o - 100); val <= o; val++) {
                 testInteger(config, val, false);
             }
@@ -242,13 +245,10 @@ public class TestLakeDestinationFinder {
 
     @Test
     public void fInvInvOffF() {
+        LakeDestinationFinder finder = new LakeDestinationFinder(CONFIG);
         // this is approximately the whole range f is meant to work on
         for (int c = -350; c <= 350; c++) {
-            assertEquals(
-                    c, LakeDestinationFinder.fInv(
-                        CONFIG,
-                        LakeDestinationFinder.fRound(CONFIG, c)
-                    )
+            assertEquals(c, finder.fInv(finder.fRound(c))
             );
         }
     }
@@ -275,23 +275,25 @@ public class TestLakeDestinationFinder {
     }
 
     public void testGetRawGridPosAlwaysSafe(ConfigInstance config, Random random) {
+        LakeDestinationFinder finder = new LakeDestinationFinder(config);
         for (int i = 1; i <= 30; i++) {
             int bound = config.lastUnsafeChunk() * 2;
             int x = random.nextInt(-bound, bound + 1);
             int z = random.nextInt(-bound, bound + 1);
             ChunkPos pos = new ChunkPos(x, z);
-            GridPos processedGridPos = LakeDestinationFinder.getRawGridPos(config, pos);
-            ChunkPos nowSafePos = LakeDestinationFinder.rawPosUnsafe(config, processedGridPos);
-            assert LakeDestinationFinder.isSafeChunk(config, nowSafePos);
+            GridPos processedGridPos = finder.getRawGridPos(pos);
+            ChunkPos nowSafePos = finder.rawPosUnsafe(processedGridPos);
+            assert finder.isSafeChunk(nowSafePos);
         }
     }
 
     public void testFFloorRoundCeil(ConfigInstance config) {
+        LakeDestinationFinder finder = new LakeDestinationFinder(config);
         for (int c = -300; c <= 300; c++) {
-            int fFloor = LakeDestinationFinder.fFloor(config, c);
-            double fRaw = LakeDestinationFinder.fRaw(config, c);
-            int fRound = LakeDestinationFinder.fRound(config, c);
-            int fCeil = LakeDestinationFinder.fCeil(config, c);
+            int fFloor = finder.fFloor(c);
+            double fRaw = finder.fRaw(c);
+            int fRound = finder.fRound(c);
+            int fCeil = finder.fCeil(c);
             Set<Integer> signums = new HashSet<>();
             signums.add(Integer.compare(fFloor, 0));
             signums.add(Double.compare(fRaw, 0));
@@ -318,10 +320,11 @@ public class TestLakeDestinationFinder {
     }
 
     public void testFInvRawIntegerWhenCeilIsEqual(ConfigInstance config, int val) {
-        int processedValue = LakeDestinationFinder.fCeil(config, LakeDestinationFinder.fInvCeil(config, val));
+        LakeDestinationFinder finder = new LakeDestinationFinder(config);
+        int processedValue = finder.fCeil(finder.fInvCeil(val));
 
         // in words: when val == f(fInvCeil(val)), fInvRaw(val) must be integer
-        assert processedValue != val || LakeDestinationFinder.fInvRaw(config, val) % 1 == 0.0;
+        assert processedValue != val || finder.fInvRaw(val) % 1 == 0.0;
     }
 
     public void testFInvRawIntegerWhenCeilIsEqual(ConfigInstance config) {
@@ -343,53 +346,54 @@ public class TestLakeDestinationFinder {
 
     @Test
     public void fInvFloorBelowF() {
+        LakeDestinationFinder finder = new LakeDestinationFinder(CONFIG);
         for (int c = -350; c <= 350; c++) {
             if (Math.abs(c) < 2) {
                 continue;
             }
-            int fC = LakeDestinationFinder.fRound(CONFIG, c);
+            int fC = finder.fRound(c);
             int signum = Integer.compare(fC, 0);
-            assertEquals(c - signum, LakeDestinationFinder.fInvFloor(CONFIG, fC - signum));
-            assertEquals(c, LakeDestinationFinder.fInvFloor(CONFIG, fC + signum));
+            assertEquals(c - signum, finder.fInvFloor(fC - signum));
+            assertEquals(c, finder.fInvFloor(fC + signum));
         }
     }
 
     @Test
     public void fInvRoundF() {
+        LakeDestinationFinder finder = new LakeDestinationFinder(CONFIG);
         for (int c = -350; c <= 350; c++) {
             if (Math.abs(c) < 2) {
                 continue;
             }
-            int fC = LakeDestinationFinder.fRound(CONFIG, c);
+            int fC = finder.fRound(c);
             int signum = Integer.compare(fC, 0);
-            assertEquals(c, LakeDestinationFinder.fInv(CONFIG, fC - signum));
-            assertEquals(c, LakeDestinationFinder.fInv(CONFIG, fC + signum));
+            assertEquals(c, finder.fInv(fC - signum));
+            assertEquals(c, finder.fInv(fC + signum));
         }
     }
 
     @Test
     public void fInvCeilAboveF() {
+        LakeDestinationFinder finder = new LakeDestinationFinder(CONFIG);
         for (int c = -350; c <= 350; c++) {
             if (Math.abs(c) < 2) {
                 continue;
             }
-            int fC = LakeDestinationFinder.fRound(CONFIG, c);
+            int fC = finder.fRound(c);
             int signum = Integer.compare(fC, 0);
-            assertEquals(c, LakeDestinationFinder.fInvCeil(CONFIG, fC - signum));
-            assertEquals(c + signum, LakeDestinationFinder.fInvCeil(CONFIG, fC + signum));
+            assertEquals(c, finder.fInvCeil(fC - signum));
+            assertEquals(c + signum, finder.fInvCeil(fC + signum));
         }
     }
 
     @Test
     public void rawGridPosInvOfRawPos() {
+        LakeDestinationFinder finder = new LakeDestinationFinder(CONFIG);
         for (int x = -100; x <= 100; x++) {
             for (int y = -100; y <= 100; y++) {
                 try {
                     GridPos oldPos = new GridPos(x, y);
-                    GridPos newPos = LakeDestinationFinder.getRawGridPos(
-                            CONFIG,
-                            LakeDestinationFinder.rawPos(CONFIG, oldPos)
-                    );
+                    GridPos newPos = finder.getRawGridPos(finder.rawPos(oldPos));
                     assertEquals(oldPos, newPos);
                 } catch (IllegalArgumentException ignored) { }
             }
@@ -405,20 +409,17 @@ public class TestLakeDestinationFinder {
     }
 
     public static void nearestLakeInvOfPosWithSeed(long seed) {
+        LakeDestinationFinder finder = new LakeDestinationFinder(CONFIG);
         for (int x = -50; x <= 50; x++) {
             for (int y = -50; y <= 50; y++) {
                 GridPos oldPos = new GridPos(x, y);
                 ChunkPos rawChunkPos;
                 try {
-                    rawChunkPos = LakeDestinationFinder.pos(CONFIG, seed, oldPos);
+                    rawChunkPos = finder.pos(seed, oldPos);
                 } catch (IllegalArgumentException exc) {
                     continue;
                 }
-                Set<GridPos> newPosses = LakeDestinationFinder.findNearestLake(
-                        CONFIG,
-                        seed,
-                        rawChunkPos
-                );
+                Set<GridPos> newPosses = finder.findNearestLake(seed, rawChunkPos);
                 assertTrue(newPosses.contains(oldPos));
             }
         }
@@ -433,11 +434,12 @@ public class TestLakeDestinationFinder {
     }
 
     public static void nearestLakeIsIndeedNearestWithSeed(long seed) {
+        LakeDestinationFinder finder = new LakeDestinationFinder(CONFIG);
         // 350 is approximately the biggest needed grid coordinate
         // define a range, leave enough tolerances for checking really every lake position
         // have to be confined so it is possible to run this efficiently
-        ChunkPos from = LakeDestinationFinder.rawPos(CONFIG, new GridPos(-50, -50));
-        ChunkPos to = LakeDestinationFinder.rawPos(CONFIG, new GridPos(50, 50));
+        ChunkPos from = finder.rawPos(new GridPos(-50, -50));
+        ChunkPos to = finder.rawPos(new GridPos(50, 50));
         Random rand = new Random(seed);
         int xCheck = rand.nextInt(from.x, to.x);
         int zCheck = rand.nextInt(from.z, to.z);
@@ -449,7 +451,7 @@ public class TestLakeDestinationFinder {
             for (int y = -100; y <= 100; y++) {
                 ChunkPos currChunk;
                 try {
-                    currChunk = LakeDestinationFinder.pos(CONFIG, seed, new GridPos(x, y));
+                    currChunk = finder.pos(seed, new GridPos(x, y));
                 } catch (RuntimeException exc) {
                     continue;
                 }
@@ -466,12 +468,11 @@ public class TestLakeDestinationFinder {
                 }
             }
         }
-        Set<ChunkPos> toCheck = LakeDestinationFinder.findNearestLake(
-                        CONFIG,
+        Set<ChunkPos> toCheck = finder.findNearestLake(
                         seed,
                         checkChunk
                 ).stream()
-                .map(gridPos -> LakeDestinationFinder.pos(CONFIG, seed, gridPos))
+                .map(gridPos -> finder.pos(seed, gridPos))
                 .collect(Collectors.toSet());
         assertTrue(bestChunks.containsAll(toCheck) && toCheck.containsAll(bestChunks));
 
@@ -585,10 +586,11 @@ public class TestLakeDestinationFinder {
 
     @Test
     public void testPiCycles() {
+        LakeDestinationFinder finder = new LakeDestinationFinder(CONFIG);
         Random random = new Random(42);
         testAbstractCycles(
                 () -> random.nextInt(1, CONFIG.nrLakes()),
-                i -> LakeDestinationFinder.pi(i, CONFIG),
+                finder::pi,
                 Objects::equals,
                 1_000
         );
@@ -596,11 +598,12 @@ public class TestLakeDestinationFinder {
 
     @Test
     public void testGridTeleportAim() {
+        LakeDestinationFinder finder = new LakeDestinationFinder(CONFIG);
         Random random = new Random(42);
         for (int i = 0; i < 3; i++) {
             int g = LakeDestinationFinder.calculateG(CONFIG.nrLakes(), CONFIG.factsPhi(), random.nextLong());
             int gInv = LakeDestinationFinder.calculateInv(CONFIG.nrLakes(), g);
-            int boundary = LakeDestinationFinder.fInv(CONFIG, (int)(Math.sqrt(CONFIG.nrLakes()) + 0.5));
+            int boundary = finder.fInv((int)(Math.sqrt(CONFIG.nrLakes()) + 0.5));
             testAbstractCycles(
                     () -> {
                         int coord1 = random.nextInt(-boundary, boundary);
@@ -618,12 +621,7 @@ public class TestLakeDestinationFinder {
                         }
                         return new GridPos(x, z);
                     },
-                    oldPos -> LakeDestinationFinder.teleportAim(
-                            CONFIG,
-                            oldPos,
-                            g,
-                            gInv
-                    ),
+                    oldPos -> finder.teleportAim(oldPos, g, gInv),
                     (pos1, pos2) -> pos1.x() == pos2.x() && pos1.y() == pos2.y(),
                     30
             );
@@ -692,20 +690,22 @@ public class TestLakeDestinationFinder {
 
     @Test
     public void testFindNewLakes() {
+        // todo: add MIDDLE_CONFIG
         for (ConfigInstance config : List.of(smallPrimeConfig, CONFIG)) {
+            LakeDestinationFinder finder = new LakeDestinationFinder(config);
             for (int border = 5_000; border <= 100_000; border += 1_000) {
                 {
-                    int nrLakes = LakeDestinationFinder.findNewNrLakes(config, border, -1);
+                    int nrLakes = finder.findNewNrLakes(border, -1);
                     int lastLake = nrLakes - 1;
-                    ChunkPos lastChunk = LakeDestinationFinder.rawPos(config, LakeDestinationFinder.c(lastLake));
+                    ChunkPos lastChunk = finder.rawPos(LakeDestinationFinder.c(lastLake));
                     BlockPos lastPos = lastChunk.getBlockPos(8, 0, 8);
                     assert Math.abs(lastPos.getX()) <= border / 2;
                     assert Math.abs(lastPos.getY()) <= border / 2;
                 }
                 {
-                    int nrLakes = LakeDestinationFinder.findNewNrLakes(config, border, +1);
+                    int nrLakes = finder.findNewNrLakes(border, +1);
                     int lastLake = nrLakes - 1;
-                    ChunkPos lastChunk = LakeDestinationFinder.rawPos(config, LakeDestinationFinder.c(lastLake));
+                    ChunkPos lastChunk = finder.rawPos(LakeDestinationFinder.c(lastLake));
                     BlockPos lastPos = lastChunk.getBlockPos(8, 0, 8);
                     assert Math.abs(lastPos.getX()) > border / 2 || Math.abs(lastPos.getZ()) > border / 2;
                 }
@@ -714,17 +714,19 @@ public class TestLakeDestinationFinder {
     }
 
     public int getNumberFromChunk(ConfigInstance config, ChunkPos chunkPos) {
-        GridPos gridPos = LakeDestinationFinder.getRawGridPos(config, chunkPos);
+        LakeDestinationFinder finder = new LakeDestinationFinder(config);
+        GridPos gridPos = finder.getRawGridPos(chunkPos);
         return LakeDestinationFinder.cInv(gridPos);
 
     }
 
     public void testLastPos(ConfigInstance config) {
+        LakeDestinationFinder finder = new LakeDestinationFinder(config);
         Random random = new Random(42);
         for (int i = 0; i < 10_000; i++) {
             int range = random.nextInt(1, 1_000);
-            ChunkPos chunkPos = LakeDestinationFinder.lastPos(config, new ChunkPos(range, range));
-            GridPos gridPos = LakeDestinationFinder.getRawGridPos(config, chunkPos);
+            ChunkPos chunkPos = finder.lastPos(new ChunkPos(range, range));
+            GridPos gridPos = finder.getRawGridPos(chunkPos);
             int toCheckNumber = LakeDestinationFinder.cInv(gridPos);
             for (int x = -range; x <= +range; x++) {
                 assert toCheckNumber >= getNumberFromChunk(config, new ChunkPos(x, +range));
@@ -778,6 +780,7 @@ public class TestLakeDestinationFinder {
     }
 
     public void testTeleportAimNeverUnsafeWithConfig(Random random, ConfigInstance config) {
+        LakeDestinationFinder finder = new LakeDestinationFinder(config);
         for (int i = 0; i < 1_000; i++) {
             int x = random.nextInt(1, (int)Math.sqrt(config.nrLakes()));
             int z = random.nextInt((int)Math.sqrt(config.nrLakes()));
@@ -795,15 +798,14 @@ public class TestLakeDestinationFinder {
             long seed = random.nextLong();
             int g = LakeDestinationFinder.getG(config.nrLakes(), config.factsPhi(), seed);
             int gInv = LakeDestinationFinder.getInv(config.nrLakes(), g);
-            ChunkPos pos = LakeDestinationFinder.teleportAim(
-                        config,
+            ChunkPos pos = finder.teleportAim(
                         new ChunkPos(x, z),
                         net.minecraft.util.math.random.Random.create(seed),
                         g,
                         gInv,
                         seed
                 );
-            assert LakeDestinationFinder.isSafeChunk(config, pos);
+            assert finder.isSafeChunk(pos);
         }
     }
 

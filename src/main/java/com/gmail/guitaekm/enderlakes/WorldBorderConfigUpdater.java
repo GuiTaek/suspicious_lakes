@@ -34,7 +34,7 @@ public class WorldBorderConfigUpdater implements WorldBorderListener {
         if (this.oldSize == this.size) {
             return;
         }
-        this.nrLakes = LakeDestinationFinder.findNewNrLakes(Enderlakes.CONFIG, (int) this.size, -1);
+        this.nrLakes = Enderlakes.finder.findNewNrLakes((int) this.size, -1);
         this.factsPhi = LakeDestinationFinder
                 .primeFactors(this.nrLakes - 1)
                 .stream()
