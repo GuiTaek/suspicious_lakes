@@ -44,7 +44,7 @@ public class TestLakeDestinationFinder {
     );
 
     @Test
-    public void testPi() {
+    public void testPiManually() {
         List<Integer> piIVals = List.of(
                 1,
 
@@ -63,6 +63,39 @@ public class TestLakeDestinationFinder {
             assertEquals(piI, finder.pi(ind++));
         }
     }
+
+    public void testPiIAutomaticially(int piI, int nrLakes) {
+        assert 1 <= piI;
+        assert piI <= nrLakes - 1;
+    }
+
+    @Test
+    public void testPiAutomatically() {
+        Random random = new Random(42);
+        for (ConfigInstance config : List.of(SMALL_CONFIG, MIDDLE_CONFIG, NORMAL_CONFIG)) {
+            ConfigInstance newConfig = new ConfigInstance(
+                    ConfigInstance.rawSource(config.nrLakes()),
+                    config.powerDistance(),
+                    config.cycleWeights(),
+                    config.minimumDistance(),
+                    0
+            );
+            LakeDestinationFinder finder = new LakeDestinationFinder(newConfig);
+            int nrLakes = finder.findNewNrLakes(random.nextInt(30_000, 100_000), -1);
+            finder.config.setNrLakesSource(ConfigInstance.rawSource(nrLakes));
+            for (int i = 1; i <= 10; i++) {
+                testPiIAutomaticially(finder.pi(i), nrLakes);
+            }
+            for (int i = nrLakes - 11; i <= nrLakes - 1; i++) {
+                testPiIAutomaticially(finder.pi(i), nrLakes);
+            }
+            for (int i = 0; i < 100; i++) {
+                testPiIAutomaticially(finder.pi(random.nextInt(1, nrLakes - 1)), nrLakes);
+            }
+
+        }
+    }
+
     @Test
     public void testCInjective() {
         Set<GridPos> usedPositions = new HashSet<>();
