@@ -47,7 +47,7 @@ public class TestLakeDestinationFinder {
                 CONFIG.cycleWeights(),
                 CONFIG.minimumDistance(),
                 factsPhi,
-                64
+                4_000
         );
     }
     final private static ConfigInstance MIDDLE_CONFIG;
@@ -779,8 +779,8 @@ public class TestLakeDestinationFinder {
 
     public void testTeleportAimNeverUnsafeWithConfig(Random random, ConfigInstance config) {
         for (int i = 0; i < 1_000; i++) {
-            int x = random.nextInt(1, config.nrLakes());
-            int z = random.nextInt(config.nrLakes());
+            int x = random.nextInt(1, (int)Math.sqrt(config.nrLakes()));
+            int z = random.nextInt((int)Math.sqrt(config.nrLakes()));
             if (random.nextBoolean()) {
                 x = -x;
             }
