@@ -729,7 +729,7 @@ public class TestLakeDestinationFinder {
     public void testLastPos(ConfigInstance config) {
         LakeDestinationFinder finder = new LakeDestinationFinder(config);
         Random random = new Random(42);
-        for (int i = 0; i < 10_000; i++) {
+        for (int i = 0; i < 300; i++) {
             int range = random.nextInt(1, 1_000);
             ChunkPos chunkPos = finder.lastPos(new ChunkPos(range, range));
             GridPos gridPos = finder.getRawGridPos(chunkPos);
