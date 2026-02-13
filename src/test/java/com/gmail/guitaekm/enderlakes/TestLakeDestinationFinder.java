@@ -253,6 +253,39 @@ public class TestLakeDestinationFinder {
         }
     }
 
+    public ConfigInstance configTransformer(ConfigInstance config, int lastUnsafeChunk) {
+        return new ConfigInstance(
+                CONFIG.nrLakes(),
+                CONFIG.powerDistance(),
+                CONFIG.cycleWeights(),
+                CONFIG.minimumDistance(),
+                CONFIG.factsPhi(),
+                lastUnsafeChunk
+        );
+    }
+
+    @Test
+    public void testGetRawGridPosAlwaysSafe() {
+        Random random = new Random(42);
+        for (int lastUnsafeChunk = 5; lastUnsafeChunk <= 100; lastUnsafeChunk++) {
+            testGetRawGridPosAlwaysSafe(configTransformer(CONFIG, lastUnsafeChunk), random);
+            testGetRawGridPosAlwaysSafe(configTransformer(MIDDLE_CONFIG, lastUnsafeChunk), random);
+            testGetRawGridPosAlwaysSafe(configTransformer(smallPrimeConfig, lastUnsafeChunk), random);
+        }
+    }
+
+    public void testGetRawGridPosAlwaysSafe(ConfigInstance config, Random random) {
+        for (int i = 1; i <= 30; i++) {
+            int bound = config.lastUnsafeChunk() * 2;
+            int x = random.nextInt(-bound, bound + 1);
+            int z = random.nextInt(-bound, bound + 1);
+            ChunkPos pos = new ChunkPos(x, z);
+            GridPos processedGridPos = LakeDestinationFinder.getRawGridPos(config, pos);
+            ChunkPos nowSafePos = LakeDestinationFinder.rawPosUnsafe(config, processedGridPos);
+            assert LakeDestinationFinder.isSafeChunk(config, nowSafePos);
+        }
+    }
+
     public void testFFloorRoundCeil(ConfigInstance config) {
         for (int c = -300; c <= 300; c++) {
             int fFloor = LakeDestinationFinder.fFloor(config, c);
