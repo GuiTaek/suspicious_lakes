@@ -487,8 +487,14 @@ public class LakeDestinationFinder {
 
     public static int lastUnsafeInteger(ConfigInstance config) {
         int coord = config.lastUnsafeChunk();
+        GridPos offset = new GridPos(0, 0);
+        if (fRound(config, fInvCeil(config, config.lastUnsafeChunk())) == config.lastUnsafeChunk() ) {
+            // probably need a new function for that
+            offset = new GridPos(1, -1);
+        }
         ChunkPos pos = lastPos(config, new ChunkPos(coord, coord));
-        return cInv(getFloorRawGridUnsafe(config, pos));
+        GridPos rawLastPos = getFloorRawGridUnsafe(config, pos);
+        return cInv(new GridPos(rawLastPos.x + offset.x, rawLastPos.y + offset.y));
     }
 
     public static ChunkPos lastPos(ConfigInstance config, ChunkPos unRotated) {
