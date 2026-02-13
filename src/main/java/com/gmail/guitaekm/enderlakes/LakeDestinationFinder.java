@@ -35,13 +35,8 @@ public class LakeDestinationFinder {
         for (int cycleLength = 1; cycleLength <= nrLakesPerCycle.length; cycleLength++) {
             unUsedCycles -= nrLakesPerCycle[cycleLength - 1];
             if (unUsedCycles < 0) {
-                int temp = unUsedCycles % cycleLength;
-                int cyclePos;
-                if (temp < 0) {
-                    cyclePos = temp + cycleLength;
-                } else {
-                    cyclePos = temp;
-                }
+                unUsedCycles += nrLakesPerCycle[cycleLength - 1];
+                int cyclePos = unUsedCycles % cycleLength;
                 if (cyclePos == cycleLength - 1) {
                     return i - cycleLength + 1;
                 }
