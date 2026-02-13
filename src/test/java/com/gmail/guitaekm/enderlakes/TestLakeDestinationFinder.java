@@ -715,10 +715,12 @@ public class TestLakeDestinationFinder {
             LakeDestinationFinder finder = new LakeDestinationFinder(config);
             int o = finder.lastUnsafeInteger();
             for (int border = 5_000; border <= 100_000; border += 1_000) {
-                ChunkPos lastChunkPosUnsafe = finder.rawPosUnsafe(LakeDestinationFinder.c(o));
-                BlockPos lastPosUnsafe = lastChunkPosUnsafe.getBlockPos(8, 0, 8);
-                if (Math.abs(lastPosUnsafe.getX()) >= border / 2
-                        || Math.abs(lastPosUnsafe.getZ()) >= border / 2) {
+                GridPos firstGridPosSafe = LakeDestinationFinder.c(o + 1);
+                ChunkPos firstChunkPosSafe = finder.rawPosUnsafe(firstGridPosSafe);
+                assert firstChunkPosSafe.x > 0 && firstChunkPosSafe.z < 0;
+                BlockPos firstPosSafe = firstChunkPosSafe.getBlockPos(0, 0, 15);
+                if (Math.abs(firstPosSafe.getX()) >= border / 2
+                        || Math.abs(firstPosSafe.getZ()) >= border / 2) {
                     continue;
                 }
                 {
