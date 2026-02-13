@@ -577,6 +577,8 @@ public class LakeDestinationFinder {
             currPos = teleportAim(currPos, minecraftRandom, g, gInv, seed);
             if (counter > config.cycleWeights().size()) {
                 // some fail-safe if someone enters a lake outside the border and none of the cycle is within
+                Enderlakes.LOGGER.warn("Somehow a suspicious lake was used that lead nowhere inside the border. If you " +
+                        "can reproduce it, please message the author of the Mod \"Suspicious Lakes\"");
                 return null;
             }
             counter++;
