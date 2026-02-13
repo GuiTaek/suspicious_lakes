@@ -514,6 +514,7 @@ public class LakeDestinationFinder {
 
     public int lastUnsafeInteger() {
         int coord = config.lastUnsafeChunk();
+        assert coord >= 0;
         GridPos offset = new GridPos(0, 0);
         if (fRound(fInvCeil(config.lastUnsafeChunk())) == config.lastUnsafeChunk() ) {
             // probably need a new function for that
@@ -521,7 +522,14 @@ public class LakeDestinationFinder {
         }
         ChunkPos pos = lastPos(new ChunkPos(coord, coord));
         GridPos rawLastPos = getFloorRawGridUnsafe(pos);
-        return cInv(new GridPos(rawLastPos.x + offset.x, rawLastPos.y + offset.y));
+        GridPos refinedPos = new GridPos(rawLastPos.x + offset.x, rawLastPos.y + offset.y);
+
+        assert refinedPos.x == -refinedPos.y;
+
+        if (refinedPos.x == 0) {
+            return 0;
+        }
+        return cInv(refinedPos);
     }
 
     public ChunkPos lastPos(ChunkPos unRotated) {
