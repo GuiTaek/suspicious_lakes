@@ -533,6 +533,10 @@ public class LakeDestinationFinder {
         assert modularMultiplicationByDoubling(g, gInv, config.nrLakes()) == 1;
         int o = lastUnsafeInteger(config);
         int number = modularMultiplicationByDoubling(g, cInv(oldPos) - o, config.nrLakes());
+        // when oldPos is very big, there is a small chance (cInv(oldPos) - o) % config.nrLakes() == 0
+        if (number == 0) {
+            number = 1;
+        }
         int mappedNumber = modularMultiplicationByDoubling(gInv, pi(number, config), config.nrLakes()) + o;
         return c(mappedNumber);
     }
