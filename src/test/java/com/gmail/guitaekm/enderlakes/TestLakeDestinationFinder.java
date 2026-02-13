@@ -285,7 +285,7 @@ public class TestLakeDestinationFinder {
     }
 
     public void testFInvRawIntegerWhenCeilIsEqual(ConfigInstance config, int val) {
-        int processedValue = LakeDestinationFinder.f(config, LakeDestinationFinder.fInvCeil(config, val));
+        int processedValue = LakeDestinationFinder.fCeil(config, LakeDestinationFinder.fInvCeil(config, val));
 
         // in words: when val == f(fInvCeil(val)), fInvRaw(val) must be integer
         assert processedValue != val || LakeDestinationFinder.fInvRaw(config, val) % 1 == 0.0;
