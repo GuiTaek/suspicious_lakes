@@ -13,10 +13,6 @@ public class WorldBorderConfigUpdater implements WorldBorderListener {
 
     public static WorldBorderConfigUpdater INSTANCE = new WorldBorderConfigUpdater();
     private LocalDateTime borderFinished;
-    private double size;
-    private double oldSize = -1;
-    private int nrLakes;
-    private int[] factsPhi;
 
     public void register() {
         ServerWorldEvents.LOAD.register((server, world) -> {
@@ -24,39 +20,13 @@ public class WorldBorderConfigUpdater implements WorldBorderListener {
                 this.borderFinished = LocalDateTime.now();
                 WorldBorder border = world.getWorldBorder();
                 border.addListener(this);
-                this.size = border.getSize();
-                this.updateBorderSize();
+                Enderlakes.finder.config.setNrLakesSource(ConfigInstance.borderSource((int)border.getSize()));
             }
         });
     }
 
-    private void updateBorderSize() {
-        if (this.oldSize == this.size) {
-            return;
-        }
-        this.nrLakes = Enderlakes.finder.findNewNrLakes((int) this.size, -1);
-        this.factsPhi = LakeDestinationFinder
-                .primeFactors(this.nrLakes - 1)
-                .stream()
-                .mapToInt(elem -> elem)
-                .toArray();
-        this.oldSize = this.size;
-    }
-
     public boolean mayUseLakes() {
         return LocalDateTime.now().isAfter(borderFinished);
-    }
-
-    public int nrLakes() {
-        this.updateBorderSize();
-        return this.nrLakes;
-    }
-
-    public int[] factsPhi() {
-        this.updateBorderSize();
-
-        // cloning so no calling code can change it
-        return this.factsPhi.clone();
     }
 
     @Override
@@ -65,13 +35,12 @@ public class WorldBorderConfigUpdater implements WorldBorderListener {
                 .plusSeconds(time / 1_000)
                 .plusNanos((time % 1_000) * 1_000_000);
 
-        // calculate the config adjustments lazy so a change border command called every tick wouldn't crash the game
-        this.size = toSize;
+        Enderlakes.finder.config.setNrLakesSource(ConfigInstance.borderSource((int) toSize));
     }
 
     @Override
     public void onSizeChange(WorldBorder border, double size) {
-        this.size = size;
+        Enderlakes.finder.config.setNrLakesSource(ConfigInstance.borderSource((int)size));
     }
 
     @Override
