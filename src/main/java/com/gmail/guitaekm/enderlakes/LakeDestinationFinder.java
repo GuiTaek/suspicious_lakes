@@ -186,12 +186,15 @@ public class LakeDestinationFinder {
      */
     public int findNewNrLakes(int border, int signum) {
         assert Math.abs(signum) == 1;
+        int o = this.lastUnsafeInteger();
         // this is the position of the last raw Pos, therefore approximately the last lake
         ChunkPos maxChunk = lastPos(new ChunkPos(new BlockPos(border / 2, 0, border / 2)));
 
         GridPos gridPos = signum == -1 ? new GridPos(fInvFloor(maxChunk.x), fInvFloor(maxChunk.z))
                 : new GridPos(fInvCeil(maxChunk.x), fInvCeil(maxChunk.z));
-        BigInteger prime = BigInteger.valueOf(cInv(gridPos));
+        int rawMappedNumber = cInv(gridPos);
+        assert rawMappedNumber > o;
+        BigInteger prime = BigInteger.valueOf(rawMappedNumber - o);
         while (!prime.isProbablePrime(1_000)) {
             prime = prime.add(BigInteger.valueOf(signum));
         }
