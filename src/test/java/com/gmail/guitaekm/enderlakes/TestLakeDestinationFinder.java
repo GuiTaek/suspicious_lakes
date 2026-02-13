@@ -692,10 +692,17 @@ public class TestLakeDestinationFinder {
     public void testFindNewLakes() {
         for (ConfigInstance config : List.of(smallPrimeConfig, MIDDLE_CONFIG, CONFIG)) {
             LakeDestinationFinder finder = new LakeDestinationFinder(config);
+            int o = finder.lastUnsafeInteger();
             for (int border = 5_000; border <= 100_000; border += 1_000) {
+                ChunkPos lastChunkPosUnsafe = finder.rawPosUnsafe(LakeDestinationFinder.c(o));
+                BlockPos lastPosUnsafe = lastChunkPosUnsafe.getBlockPos(8, 0, 8);
+                if (Math.abs(lastPosUnsafe.getX()) >= border / 2
+                        || Math.abs(lastPosUnsafe.getZ()) >= border / 2) {
+                    continue;
+                }
                 {
                     int nrLakes = finder.findNewNrLakes(border, -1);
-                    int lastLake = nrLakes - 1;
+                    int lastLake = o + nrLakes - 1;
                     ChunkPos lastChunk = finder.rawPos(LakeDestinationFinder.c(lastLake));
                     BlockPos lastPos = lastChunk.getBlockPos(8, 0, 8);
                     assert Math.abs(lastPos.getX()) <= border / 2;
@@ -703,9 +710,9 @@ public class TestLakeDestinationFinder {
                 }
                 {
                     int nrLakes = finder.findNewNrLakes(border, +1);
-                    int lastLake = nrLakes - 1;
+                    int lastLake = o + nrLakes - 1;
                     ChunkPos lastChunk = finder.rawPos(LakeDestinationFinder.c(lastLake));
-                    BlockPos lastPos = lastChunk.getBlockPos(8, 0, 8);
+                    BlockPos lastPos = lastChunk.getBlockPos(15, 0, 0);
                     assert Math.abs(lastPos.getX()) > border / 2 || Math.abs(lastPos.getZ()) > border / 2;
                 }
             }
