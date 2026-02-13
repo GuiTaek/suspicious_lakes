@@ -211,8 +211,22 @@ public class LakeDestinationFinder {
         return res;
     }
 
+    public static ChunkPos rawPosUnsafe(ConfigInstance config, GridPos pos) {
+        return rawPosUnsafe(config, pos.x, pos.y);
+    }
+
     public static ChunkPos rawPosUnsafe(ConfigInstance config, int x, int y) {
         ChunkPos res = new ChunkPos(fRound(config, x), fRound(config, y));
+        return res;
+    }
+
+    public static ChunkPos rawPosCeilUnsafe(ConfigInstance config, GridPos pos) {
+        ChunkPos res = new ChunkPos(fCeil(config, pos.x), fCeil(config, pos.y));
+        return res;
+    }
+
+    public static ChunkPos rawPosFloorUnsafe(ConfigInstance config, GridPos pos) {
+        ChunkPos res = new ChunkPos(fFloor(config, pos.x), fFloor(config, pos.y));
         return res;
     }
 
@@ -297,16 +311,20 @@ public class LakeDestinationFinder {
     }
 
     public static GridPos getRawGridPos(ConfigInstance config, ChunkPos pos) {
-        if (!LakeDestinationFinder.isSafeChunk(config, pos)) {
+        GridPos result = getRawGridPosUnsafe(config, pos);
+        ChunkPos worstCasePos = rawPosFloorUnsafe(config, result);
+        if (!LakeDestinationFinder.isSafeChunk(config, worstCasePos)) {
             if (Math.abs(pos.x) > Math.abs(pos.z)) {
-                int signum = Integer.compare(pos.x, 0);
-                pos = new ChunkPos(config.lastUnsafeChunk() * signum, pos.z);
+                int signum = pos.x >= 0 ? 1 : -1;
+                pos = new ChunkPos((config.lastUnsafeChunk() + 1) * signum, pos.z);
+                result = getCeilRawGridPosUnsafe(config, pos);
             } else {
-                int signum = Integer.compare(pos.z, 0);
-                pos = new ChunkPos(pos.x, config.lastUnsafeChunk() * signum);
+                int signum = pos.z >= 0 ? 1 : -1;
+                pos = new ChunkPos(pos.x, (config.lastUnsafeChunk() + 1) * signum);
+                result = getCeilRawGridPosUnsafe(config, pos);
             }
         }
-        return getRawGridPosUnsafe(config, pos);
+        return result;
     }
 
     private static GridPos getRawGridPosUnsafe(ConfigInstance config, ChunkPos pos) {
@@ -315,6 +333,10 @@ public class LakeDestinationFinder {
 
     private static GridPos getFloorRawGridUnsafe(ConfigInstance config, ChunkPos pos) {
         return new GridPos(fInvFloor(config, pos.x), fInvFloor(config, pos.z));
+    }
+
+    public static GridPos getCeilRawGridPosUnsafe(ConfigInstance config, ChunkPos pos) {
+        return new GridPos(fInvCeil(config, pos.x), fInvCeil(config, pos.z));
     }
 
     public static Set<GridPos> findNearestLake(ConfigInstance config, long seed, ChunkPos pos) {
