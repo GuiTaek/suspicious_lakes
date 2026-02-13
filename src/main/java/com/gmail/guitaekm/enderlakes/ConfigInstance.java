@@ -3,6 +3,7 @@ package com.gmail.guitaekm.enderlakes;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ConfigInstance {
 
@@ -11,10 +12,15 @@ public class ConfigInstance {
     final private int minimumDistance;
     final private int lastUnsafeChunk;
 
+    private long seed;
+    private Long oldSeed = null;
+    private int g;
+    private int gInv;
     private int nrLakes;
     private int[] factsPhi;
     private boolean sourceChanged;
     private NrLakesSource nrLakesSource;
+    private Integer oldNrLakes = null;
 
     public enum NrLakesSourceType {
         RAW,
@@ -108,5 +114,25 @@ public class ConfigInstance {
     }
     public int lastUnsafeChunk() {
         return this.lastUnsafeChunk;
+    }
+    public void setSeed(long seed) {
+        this.seed = seed;
+    }
+    public void updateG() {
+        if (!Objects.equals(this.oldSeed, this.seed) || !Objects.equals(this.oldNrLakes, this.nrLakes())) {
+            this.g = LakeDestinationFinder.getG(this.nrLakes(), this.factsPhi(), this.seed);
+            this.gInv = LakeDestinationFinder.calculateInv(this.nrLakes(), this.g);
+            this.oldSeed = this.seed;
+            this.oldNrLakes = this.nrLakes();
+            System.out.println("updated");
+        }
+    }
+    public int g() {
+        this.updateG();
+        return this.g;
+    }
+    public int gInv() {
+        this.updateG();
+        return this.gInv;
     }
 }

@@ -3,7 +3,6 @@ package com.gmail.guitaekm.enderlakes;
 import com.gmail.guitaekm.enderlakes.lakes.Structures;
 import net.fabricmc.api.ModInitializer;
 
-import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.block.*;
 import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.entity.EntityType;
@@ -27,8 +26,7 @@ public class Enderlakes implements ModInitializer {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-	public static final ConfigInstance CONFIG = new ConfigInstance();
-    public static final LakeDestinationFinder finder = new LakeDestinationFinder(CONFIG);
+    public static final LakeDestinationFinder finder = new LakeDestinationFinder(new ConfigInstance());
 
 	public static final FlowableFluid SUSPICIOUS_LIQUID_STILL_FLUID = Registry.register(
 			Registries.FLUID,

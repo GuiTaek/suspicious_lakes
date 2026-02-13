@@ -123,12 +123,9 @@ public class SuspiciousFluidBlock extends FluidBlock {
             return false;
         }
         long seed = Objects.requireNonNull(world.getServer()).getOverworld().getSeed();
-        int g = LakeDestinationFinder.getG(
-                Enderlakes.CONFIG.nrLakes(),
-                Enderlakes.CONFIG.factsPhi(),
-                seed
-        );
-        int gInv = LakeDestinationFinder.getInv(Enderlakes.CONFIG.nrLakes(), g);
+        Enderlakes.finder.config.setSeed(seed);
+        int g = Enderlakes.finder.config.g();
+        int gInv = Enderlakes.finder.config.gInv();
         // todo: check if random is seed dependent
         ChunkPos destChunk = Enderlakes.finder.safeTeleportAim(world, new ChunkPos(fromPos), world.getRandom(), g, gInv, seed);
         if (destChunk == null) {

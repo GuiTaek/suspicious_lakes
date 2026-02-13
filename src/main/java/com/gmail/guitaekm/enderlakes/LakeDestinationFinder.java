@@ -630,15 +630,4 @@ public class LakeDestinationFinder {
         // oldS can be negative
         return (oldS + N) % N;
     }
-
-    private static Integer lastG = null;
-    private static int gInv;
-
-    public static int getInv(int N, int g) {
-        if (!Objects.equals(g, lastG)) {
-            gInv = calculateInv(N, g);
-            lastG = g;
-        }
-        return LakeDestinationFinder.gInv;
-    }
 }

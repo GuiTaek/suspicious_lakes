@@ -23,8 +23,8 @@
 - remove distinction between minecraft chunkpos and my cunkpos (it was needed because of my problem to get tests to work) (erl.)
 - make LakeDestinationFinder a class with methods that implicidly have a config (erl.)
 - rename smallPrimeConfig (erl.)
-- ConfigInstance shouldn't depend on WorldBorderConfigUpdater
-- is rotation turned on?
+- ConfigInstance shouldn't depend on WorldBorderConfigUpdater (erl.)
+- is rotation turned on? (erl.)
 - enderlakes->suspiciouslakes
 - generate a single source to do the least destruction and convert air to endstone
 - update at least to minecraft:1.21.1

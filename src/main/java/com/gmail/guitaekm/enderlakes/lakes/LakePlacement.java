@@ -2,11 +2,8 @@ package com.gmail.guitaekm.enderlakes.lakes;
 
 import com.gmail.guitaekm.enderlakes.Enderlakes;
 import com.gmail.guitaekm.enderlakes.LakeDestinationFinder;
-import com.mojang.datafixers.util.Pair;
 import com.mojang.datafixers.util.Unit;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3i;
@@ -14,7 +11,6 @@ import net.minecraft.world.gen.chunk.placement.*;
 
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
 
 public class LakePlacement extends RandomSpreadStructurePlacement {
 
