@@ -132,9 +132,24 @@ public class LakeDestinationFinder {
         return cInv(new GridPos(x, y));
     }
 
-    public static int f(ConfigInstance config, int c) {
+    public static int fRound(ConfigInstance config, int c) {
         int signum = Integer.compare(c, 0);
-        return (int) (signum * Math.round(config.minimumDistance() * Math.pow(Math.abs(c), config.powerDistance())));
+        return signum * (int) Math.round(signum * fRaw(config, c));
+    }
+
+    public static int fCeil(ConfigInstance config, int c) {
+        int signum = Integer.compare(c, 0);
+        return signum * (int) Math.ceil(signum * fRaw(config, c));
+    }
+
+    public static int fFloor(ConfigInstance config, int c) {
+        int signum = Integer.compare(c, 0);
+        return signum * (int) Math.floor(signum * fRaw(config, c));
+    }
+
+    public static double fRaw(ConfigInstance config, int c) {
+        int signum = Integer.compare(c, 0);
+        return signum * config.minimumDistance() * Math.pow(Math.abs(c), config.powerDistance());
     }
 
     public static double fInvRaw(ConfigInstance config, int c) {
@@ -189,7 +204,7 @@ public class LakeDestinationFinder {
      * @return the chunk position that the grid position relates to in the minecraft world
      */
     public static ChunkPos rawPos(ConfigInstance config, int x, int y) {
-        ChunkPos res = new ChunkPos(f(config, x), f(config, y));
+        ChunkPos res = new ChunkPos(fRound(config, x), fRound(config, y));
         if (!isSafeChunk(config, res)) {
             throw new IllegalArgumentException("rawPos got a non safe pos: %s".formatted(res.toString()));
         }
@@ -197,7 +212,7 @@ public class LakeDestinationFinder {
     }
 
     public static ChunkPos rawPosUnsafe(ConfigInstance config, int x, int y) {
-        ChunkPos res = new ChunkPos(f(config, x), f(config, y));
+        ChunkPos res = new ChunkPos(fRound(config, x), fRound(config, y));
         return res;
     }
 

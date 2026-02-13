@@ -247,10 +247,41 @@ public class TestLakeDestinationFinder {
             assertEquals(
                     c, LakeDestinationFinder.fInv(
                         CONFIG,
-                        LakeDestinationFinder.f(CONFIG, c)
+                        LakeDestinationFinder.fRound(CONFIG, c)
                     )
             );
         }
+    }
+
+    public void testFFloorRoundCeil(ConfigInstance config) {
+        for (int c = -300; c <= 300; c++) {
+            int fFloor = LakeDestinationFinder.fFloor(config, c);
+            double fRaw = LakeDestinationFinder.fRaw(config, c);
+            int fRound = LakeDestinationFinder.fRound(config, c);
+            int fCeil = LakeDestinationFinder.fCeil(config, c);
+            Set<Integer> signums = new HashSet<>();
+            signums.add(Integer.compare(fFloor, 0));
+            signums.add(Double.compare(fRaw, 0));
+            signums.add(Integer.compare(fRound, 0));
+            signums.add(Integer.compare(fCeil, 0));
+            assert signums.size() == 1;
+            assert signums.stream().findFirst().get().equals(Integer.compare(c, 0));
+
+            fFloor = Math.abs(fFloor);
+            fRaw = Math.abs(fRaw);
+            fRound = Math.abs(fRound);
+            fCeil = Math.abs(fCeil);
+
+            assert fFloor <= fRaw && fRaw  <= fCeil;
+            assert fFloor <= fRound && fRound <= fCeil;
+        }
+    }
+
+    @Test
+    public void testFFloorRoundCeil() {
+        testFFloorRoundCeil(CONFIG);
+        testFFloorRoundCeil(MIDDLE_CONFIG);
+        testFFloorRoundCeil(smallPrimeConfig);
     }
 
     public void testFInvRawIntegerWhenCeilIsEqual(ConfigInstance config, int val) {
@@ -283,7 +314,7 @@ public class TestLakeDestinationFinder {
             if (Math.abs(c) < 2) {
                 continue;
             }
-            int fC = LakeDestinationFinder.f(CONFIG, c);
+            int fC = LakeDestinationFinder.fRound(CONFIG, c);
             int signum = Integer.compare(fC, 0);
             assertEquals(c - signum, LakeDestinationFinder.fInvFloor(CONFIG, fC - signum));
             assertEquals(c, LakeDestinationFinder.fInvFloor(CONFIG, fC + signum));
@@ -296,7 +327,7 @@ public class TestLakeDestinationFinder {
             if (Math.abs(c) < 2) {
                 continue;
             }
-            int fC = LakeDestinationFinder.f(CONFIG, c);
+            int fC = LakeDestinationFinder.fRound(CONFIG, c);
             int signum = Integer.compare(fC, 0);
             assertEquals(c, LakeDestinationFinder.fInv(CONFIG, fC - signum));
             assertEquals(c, LakeDestinationFinder.fInv(CONFIG, fC + signum));
@@ -309,7 +340,7 @@ public class TestLakeDestinationFinder {
             if (Math.abs(c) < 2) {
                 continue;
             }
-            int fC = LakeDestinationFinder.f(CONFIG, c);
+            int fC = LakeDestinationFinder.fRound(CONFIG, c);
             int signum = Integer.compare(fC, 0);
             assertEquals(c, LakeDestinationFinder.fInvCeil(CONFIG, fC - signum));
             assertEquals(c + signum, LakeDestinationFinder.fInvCeil(CONFIG, fC + signum));
