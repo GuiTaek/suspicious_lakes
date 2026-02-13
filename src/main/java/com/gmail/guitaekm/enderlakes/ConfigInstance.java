@@ -124,7 +124,6 @@ public class ConfigInstance {
             this.gInv = LakeDestinationFinder.calculateInv(this.nrLakes(), this.g);
             this.oldSeed = this.seed;
             this.oldNrLakes = this.nrLakes();
-            System.out.println("updated");
         }
     }
     public int g() {
