@@ -19,7 +19,9 @@
 - fix block in small_lake_1.nbt (erl.)
 
 - update fabric (erl.)
-- implement teleport logic
-- remove distinction between minecraft chunkpos and my cunkpos (it was needed because of my problem to get tests to work)
+- implement teleport logic (erl.)
+- remove distinction between minecraft chunkpos and my cunkpos (it was needed because of my problem to get tests to work) (erl.)
+- make LakeDestinationFinder a class with methods that implicidly have a config
+- rename smallPrimeConfig
 - generate a single source to do the least destruction and convert air to endstone
 - update at least to minecraft:1.21.1
