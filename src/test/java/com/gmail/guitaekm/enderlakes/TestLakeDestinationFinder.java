@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestLakeDestinationFinder {
     public static final Logger LOGGER = LoggerFactory.getLogger("lake_destination_tester");
-    static ConfigInstance smallPrimeConfig = new ConfigInstance(
+    static ConfigInstance SMALL_CONFIG = new ConfigInstance(
             19,
             ConfigValues.powerDistance,
             List.of(
@@ -32,10 +32,10 @@ public class TestLakeDestinationFinder {
             new int[] {2, 3, 3},
             100
     );
-    final private static ConfigInstance CONFIG =  new ConfigInstance();
+    final private static ConfigInstance NORMAL_CONFIG =  new ConfigInstance();
 
     static {
-        LakeDestinationFinder finder = new LakeDestinationFinder(CONFIG);
+        LakeDestinationFinder finder = new LakeDestinationFinder(NORMAL_CONFIG);
         int nrLakes = finder.findNewNrLakes(30_000, -1);
         int[] factsPhi = LakeDestinationFinder.primeFactors(nrLakes - 1)
                 .stream()
@@ -44,9 +44,9 @@ public class TestLakeDestinationFinder {
 
         MIDDLE_CONFIG = new ConfigInstance(
                 nrLakes,
-                CONFIG.powerDistance(),
-                CONFIG.cycleWeights(),
-                CONFIG.minimumDistance(),
+                NORMAL_CONFIG.powerDistance(),
+                NORMAL_CONFIG.cycleWeights(),
+                NORMAL_CONFIG.minimumDistance(),
                 factsPhi,
                 4_000
         );
@@ -69,7 +69,7 @@ public class TestLakeDestinationFinder {
         );
         int ind = 1;
         for (Integer piI : piIVals) {
-            LakeDestinationFinder finder = new LakeDestinationFinder(smallPrimeConfig);
+            LakeDestinationFinder finder = new LakeDestinationFinder(SMALL_CONFIG);
             assertEquals(piI, finder.pi(ind++));
         }
     }
@@ -226,11 +226,11 @@ public class TestLakeDestinationFinder {
     public void testLastUnsafeIntegerIsReallyLast() {
         for (int lastUnsafeChunk = 10; lastUnsafeChunk < 100; lastUnsafeChunk++) {
             ConfigInstance config = new ConfigInstance(
-                    CONFIG.nrLakes(),
-                    CONFIG.powerDistance(),
-                    CONFIG.cycleWeights(),
-                    CONFIG.minimumDistance(),
-                    CONFIG.factsPhi(),
+                    NORMAL_CONFIG.nrLakes(),
+                    NORMAL_CONFIG.powerDistance(),
+                    NORMAL_CONFIG.cycleWeights(),
+                    NORMAL_CONFIG.minimumDistance(),
+                    NORMAL_CONFIG.factsPhi(),
                     lastUnsafeChunk
             );
             int o = new LakeDestinationFinder(config).lastUnsafeInteger();
@@ -245,7 +245,7 @@ public class TestLakeDestinationFinder {
 
     @Test
     public void fInvInvOffF() {
-        LakeDestinationFinder finder = new LakeDestinationFinder(CONFIG);
+        LakeDestinationFinder finder = new LakeDestinationFinder(NORMAL_CONFIG);
         // this is approximately the whole range f is meant to work on
         for (int c = -350; c <= 350; c++) {
             assertEquals(c, finder.fInv(finder.fRound(c))
@@ -255,11 +255,11 @@ public class TestLakeDestinationFinder {
 
     public ConfigInstance configTransformer(ConfigInstance config, int lastUnsafeChunk) {
         return new ConfigInstance(
-                CONFIG.nrLakes(),
-                CONFIG.powerDistance(),
-                CONFIG.cycleWeights(),
-                CONFIG.minimumDistance(),
-                CONFIG.factsPhi(),
+                NORMAL_CONFIG.nrLakes(),
+                NORMAL_CONFIG.powerDistance(),
+                NORMAL_CONFIG.cycleWeights(),
+                NORMAL_CONFIG.minimumDistance(),
+                NORMAL_CONFIG.factsPhi(),
                 lastUnsafeChunk
         );
     }
@@ -268,9 +268,9 @@ public class TestLakeDestinationFinder {
     public void testGetRawGridPosAlwaysSafe() {
         Random random = new Random(42);
         for (int lastUnsafeChunk = 5; lastUnsafeChunk <= 100; lastUnsafeChunk++) {
-            testGetRawGridPosAlwaysSafe(configTransformer(CONFIG, lastUnsafeChunk), random);
+            testGetRawGridPosAlwaysSafe(configTransformer(NORMAL_CONFIG, lastUnsafeChunk), random);
             testGetRawGridPosAlwaysSafe(configTransformer(MIDDLE_CONFIG, lastUnsafeChunk), random);
-            testGetRawGridPosAlwaysSafe(configTransformer(smallPrimeConfig, lastUnsafeChunk), random);
+            testGetRawGridPosAlwaysSafe(configTransformer(SMALL_CONFIG, lastUnsafeChunk), random);
         }
     }
 
@@ -314,9 +314,9 @@ public class TestLakeDestinationFinder {
 
     @Test
     public void testFFloorRoundCeil() {
-        testFFloorRoundCeil(CONFIG);
+        testFFloorRoundCeil(NORMAL_CONFIG);
         testFFloorRoundCeil(MIDDLE_CONFIG);
-        testFFloorRoundCeil(smallPrimeConfig);
+        testFFloorRoundCeil(SMALL_CONFIG);
     }
 
     public void testFInvRawIntegerWhenCeilIsEqual(ConfigInstance config, int val) {
@@ -339,14 +339,14 @@ public class TestLakeDestinationFinder {
 
     @Test
     public void testFInvRawIntegerWhenCeilIsEqual() {
-        testFInvRawIntegerWhenCeilIsEqual(CONFIG);
+        testFInvRawIntegerWhenCeilIsEqual(NORMAL_CONFIG);
         testFInvRawIntegerWhenCeilIsEqual(MIDDLE_CONFIG);
-        testFInvRawIntegerWhenCeilIsEqual(smallPrimeConfig);
+        testFInvRawIntegerWhenCeilIsEqual(SMALL_CONFIG);
     }
 
     @Test
     public void fInvFloorBelowF() {
-        LakeDestinationFinder finder = new LakeDestinationFinder(CONFIG);
+        LakeDestinationFinder finder = new LakeDestinationFinder(NORMAL_CONFIG);
         for (int c = -350; c <= 350; c++) {
             if (Math.abs(c) < 2) {
                 continue;
@@ -360,7 +360,7 @@ public class TestLakeDestinationFinder {
 
     @Test
     public void fInvRoundF() {
-        LakeDestinationFinder finder = new LakeDestinationFinder(CONFIG);
+        LakeDestinationFinder finder = new LakeDestinationFinder(NORMAL_CONFIG);
         for (int c = -350; c <= 350; c++) {
             if (Math.abs(c) < 2) {
                 continue;
@@ -374,7 +374,7 @@ public class TestLakeDestinationFinder {
 
     @Test
     public void fInvCeilAboveF() {
-        LakeDestinationFinder finder = new LakeDestinationFinder(CONFIG);
+        LakeDestinationFinder finder = new LakeDestinationFinder(NORMAL_CONFIG);
         for (int c = -350; c <= 350; c++) {
             if (Math.abs(c) < 2) {
                 continue;
@@ -388,7 +388,7 @@ public class TestLakeDestinationFinder {
 
     @Test
     public void rawGridPosInvOfRawPos() {
-        LakeDestinationFinder finder = new LakeDestinationFinder(CONFIG);
+        LakeDestinationFinder finder = new LakeDestinationFinder(NORMAL_CONFIG);
         for (int x = -100; x <= 100; x++) {
             for (int y = -100; y <= 100; y++) {
                 try {
@@ -409,7 +409,7 @@ public class TestLakeDestinationFinder {
     }
 
     public static void nearestLakeInvOfPosWithSeed(long seed) {
-        LakeDestinationFinder finder = new LakeDestinationFinder(CONFIG);
+        LakeDestinationFinder finder = new LakeDestinationFinder(NORMAL_CONFIG);
         for (int x = -50; x <= 50; x++) {
             for (int y = -50; y <= 50; y++) {
                 GridPos oldPos = new GridPos(x, y);
@@ -434,7 +434,7 @@ public class TestLakeDestinationFinder {
     }
 
     public static void nearestLakeIsIndeedNearestWithSeed(long seed) {
-        LakeDestinationFinder finder = new LakeDestinationFinder(CONFIG);
+        LakeDestinationFinder finder = new LakeDestinationFinder(NORMAL_CONFIG);
         // 350 is approximately the biggest needed grid coordinate
         // define a range, leave enough tolerances for checking really every lake position
         // have to be confined so it is possible to run this efficiently
@@ -523,10 +523,10 @@ public class TestLakeDestinationFinder {
 
     @Test void testIsPrimitiveRootIsFast() {
         int counter = 0;
-        int n = CONFIG.nrLakes();
+        int n = NORMAL_CONFIG.nrLakes();
         for (int i = 0; i < 100; i++) {
-            int g = new Random().nextInt(CONFIG.nrLakes());
-            if (LakeDestinationFinder.isPrimitiveRootFast(g, n, CONFIG.factsPhi())) {
+            int g = new Random().nextInt(NORMAL_CONFIG.nrLakes());
+            if (LakeDestinationFinder.isPrimitiveRootFast(g, n, NORMAL_CONFIG.factsPhi())) {
                 counter++;
             }
         }
@@ -586,10 +586,10 @@ public class TestLakeDestinationFinder {
 
     @Test
     public void testPiCycles() {
-        LakeDestinationFinder finder = new LakeDestinationFinder(CONFIG);
+        LakeDestinationFinder finder = new LakeDestinationFinder(NORMAL_CONFIG);
         Random random = new Random(42);
         testAbstractCycles(
-                () -> random.nextInt(1, CONFIG.nrLakes()),
+                () -> random.nextInt(1, NORMAL_CONFIG.nrLakes()),
                 finder::pi,
                 Objects::equals,
                 1_000
@@ -598,12 +598,12 @@ public class TestLakeDestinationFinder {
 
     @Test
     public void testGridTeleportAim() {
-        LakeDestinationFinder finder = new LakeDestinationFinder(CONFIG);
+        LakeDestinationFinder finder = new LakeDestinationFinder(NORMAL_CONFIG);
         Random random = new Random(42);
         for (int i = 0; i < 3; i++) {
-            int g = LakeDestinationFinder.calculateG(CONFIG.nrLakes(), CONFIG.factsPhi(), random.nextLong());
-            int gInv = LakeDestinationFinder.calculateInv(CONFIG.nrLakes(), g);
-            int boundary = finder.fInv((int)(Math.sqrt(CONFIG.nrLakes()) + 0.5));
+            int g = LakeDestinationFinder.calculateG(NORMAL_CONFIG.nrLakes(), NORMAL_CONFIG.factsPhi(), random.nextLong());
+            int gInv = LakeDestinationFinder.calculateInv(NORMAL_CONFIG.nrLakes(), g);
+            int boundary = finder.fInv((int)(Math.sqrt(NORMAL_CONFIG.nrLakes()) + 0.5));
             testAbstractCycles(
                     () -> {
                         int coord1 = random.nextInt(-boundary, boundary);
@@ -678,7 +678,7 @@ public class TestLakeDestinationFinder {
                 previousElements.clear();
                 currentElement = startElements.get();
             }
-            if (previousElements.size() > CONFIG.cycleWeights().size()) {
+            if (previousElements.size() > NORMAL_CONFIG.cycleWeights().size()) {
                 LOGGER.error(String.valueOf(previousElements));
                 assert false;
             }
@@ -690,7 +690,7 @@ public class TestLakeDestinationFinder {
 
     @Test
     public void testFindNewLakes() {
-        for (ConfigInstance config : List.of(smallPrimeConfig, MIDDLE_CONFIG, CONFIG)) {
+        for (ConfigInstance config : List.of(SMALL_CONFIG, MIDDLE_CONFIG, NORMAL_CONFIG)) {
             LakeDestinationFinder finder = new LakeDestinationFinder(config);
             int o = finder.lastUnsafeInteger();
             for (int border = 5_000; border <= 100_000; border += 1_000) {
@@ -747,9 +747,9 @@ public class TestLakeDestinationFinder {
 
     @Test
     public void testLastPos() {
-        testLastPos(CONFIG);
+        testLastPos(NORMAL_CONFIG);
         testLastPos(MIDDLE_CONFIG);
-        testLastPos(smallPrimeConfig);
+        testLastPos(SMALL_CONFIG);
     }
 
     @Test
@@ -772,16 +772,16 @@ public class TestLakeDestinationFinder {
     }
 
     public void testGIsPrimitiveRoot(ConfigInstance config, long seed) {
-        int g = LakeDestinationFinder.getG(CONFIG.nrLakes(), CONFIG.factsPhi(), seed);
-        assert LakeDestinationFinder.isPrimitiveRootFast(g, CONFIG.nrLakes(), CONFIG.factsPhi());
+        int g = LakeDestinationFinder.getG(NORMAL_CONFIG.nrLakes(), NORMAL_CONFIG.factsPhi(), seed);
+        assert LakeDestinationFinder.isPrimitiveRootFast(g, NORMAL_CONFIG.nrLakes(), NORMAL_CONFIG.factsPhi());
     }
 
     @Test
     public void testGIsPrimitiveRoot() {
         Random random = new Random(42);
         for (int i = 0; i < 1000; i++) {
-            testGIsPrimitiveRoot(CONFIG, random.nextLong());
-            testGIsPrimitiveRoot(smallPrimeConfig, random.nextLong());
+            testGIsPrimitiveRoot(NORMAL_CONFIG, random.nextLong());
+            testGIsPrimitiveRoot(SMALL_CONFIG, random.nextLong());
         }
     }
 
@@ -818,8 +818,8 @@ public class TestLakeDestinationFinder {
     @Test
     public void testTeleportAimNeverUnsafe() {
         Random random = new Random(42);
-        testTeleportAimNeverUnsafeWithConfig(random, CONFIG);
+        testTeleportAimNeverUnsafeWithConfig(random, NORMAL_CONFIG);
         testTeleportAimNeverUnsafeWithConfig(random, MIDDLE_CONFIG);
-        testTeleportAimNeverUnsafeWithConfig(random, smallPrimeConfig);
+        testTeleportAimNeverUnsafeWithConfig(random, SMALL_CONFIG);
     }
 }
