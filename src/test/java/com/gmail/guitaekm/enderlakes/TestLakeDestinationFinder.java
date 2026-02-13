@@ -255,11 +255,11 @@ public class TestLakeDestinationFinder {
 
     public ConfigInstance configTransformer(ConfigInstance config, int lastUnsafeChunk) {
         return new ConfigInstance(
-                NORMAL_CONFIG.nrLakes(),
-                NORMAL_CONFIG.powerDistance(),
-                NORMAL_CONFIG.cycleWeights(),
-                NORMAL_CONFIG.minimumDistance(),
-                NORMAL_CONFIG.factsPhi(),
+                config.nrLakes(),
+                config.powerDistance(),
+                config.cycleWeights(),
+                config.minimumDistance(),
+                config.factsPhi(),
                 lastUnsafeChunk
         );
     }
