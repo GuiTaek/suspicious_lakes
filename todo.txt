@@ -26,5 +26,5 @@
 - ConfigInstance shouldn't depend on WorldBorderConfigUpdater (erl.)
 - is rotation turned on? (erl.)
 - enderlakes->suspiciouslakes
-- generate a single source to do the least destruction and convert air to endstone
+- generate a single source to do the least destruction and convert air to endstone (erl.)
 - update at least to minecraft:1.21.1
