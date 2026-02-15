@@ -70,6 +70,7 @@ public class Enderlakes implements ModInitializer {
 	public static final TagKey<Fluid> SUSPICIOUS_LIQUID = TagKey.of(RegistryKeys.FLUID, Identifier.of(MOD_ID, "suspicious_liquid"));
     public static final TagKey<EntityType<?>> PERMEABLE_BY_SUSPICIOUS_FLUID = TagKey.of(RegistryKeys.ENTITY_TYPE, Identifier.of(MOD_ID, "permeable_by_suspicious_fluid"));
     public static final TagKey<Biome> HAS_STRUCTURE_SUSPICIOUS_LAKE = TagKey.of(RegistryKeys.BIOME, Identifier.of(MOD_ID, "has_structure/suspicious_lake"));
+    public static final TagKey<Block> REPLACEABLE_BY_SUSPICIOUS_LAKES = TagKey.of(RegistryKeys.BLOCK, Identifier.of(MOD_ID, "replaceable_by_suspicious_lakes"));
 
 	@Override
 	public void onInitialize() {

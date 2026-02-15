@@ -13,6 +13,7 @@ import net.minecraft.util.math.*;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.*;
 import net.minecraft.world.*;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
 
 import java.util.Objects;
@@ -136,19 +137,34 @@ public class SuspiciousFluidBlock extends FluidBlock {
             throw new IllegalStateException("this code shouldn't run client-side");
         }
         // the reason this is so weird and difficult is, that the chunk is not loaded and maybe not even generated
-        // DataFlowIssue isn't a problem because we set "create" to true
-        @SuppressWarnings("DataFlowIssue") int lakeTopLayer = serverWorld
+        Chunk chunk = serverWorld
                 .getChunkManager()
                 .getChunk(
                         destChunk.x,
                         destChunk.z,
                         ChunkStatus.FULL,
                         true
-                ).sampleHeightmap(
+                );
+        // chunk != null because we set "create" to true
+        assert chunk != null;
+        int lakeTopLayer = chunk.sampleHeightmap(
                         Heightmap.Type.WORLD_SURFACE,
                         toPosRaw.getX(),
                         toPosRaw.getZ()
                 );
+        BlockPos emergencyLake = toPosRaw.withY(lakeTopLayer);
+        if (!chunk.getBlockState(emergencyLake).getBlock().equals(Enderlakes.SUSPICIOUS_LIQUID_BLOCK)) {
+            chunk.setBlockState(emergencyLake, Enderlakes.SUSPICIOUS_LIQUID_BLOCK.getDefaultState(), false);
+            for (Direction dir: Direction.values()) {
+                if (dir.equals(Direction.UP)) {
+                    continue;
+                }
+                BlockPos endstonePos = emergencyLake.add(dir.getVector());
+                if (chunk.getBlockState(endstonePos).isIn(Enderlakes.REPLACEABLE_BY_SUSPICIOUS_LAKES)) {
+                    chunk.setBlockState(endstonePos, Blocks.END_STONE.getDefaultState(), false);
+                }
+            }
+        }
         int toY = lakeTopLayer + 1;
         BlockPos toPos = toPosRaw.withY(toY);
         Vec3d targetPosition = new Vec3d(toPos.getX() + 0.5, toPos.getY(), toPos.getZ() + 0.5);
