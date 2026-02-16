@@ -152,6 +152,7 @@ public class SuspiciousFluidBlock extends FluidBlock {
                         toPosRaw.getX(),
                         toPosRaw.getZ()
                 );
+        lakeTopLayer = lakeTopLayer != -1 ? lakeTopLayer : world.getRandom().nextBetween(1, world.getTopY());
         BlockPos emergencyLake = toPosRaw.withY(lakeTopLayer);
         if (!chunk.getBlockState(emergencyLake).getBlock().equals(Enderlakes.SUSPICIOUS_LIQUID_BLOCK)) {
             chunk.setBlockState(emergencyLake, Enderlakes.SUSPICIOUS_LIQUID_BLOCK.getDefaultState(), false);
