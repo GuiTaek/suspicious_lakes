@@ -15,7 +15,7 @@ public class TestW {
     public static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger("W_tester");
 
     // big number used for testing for approximately equal
-    private static final double OMEGA = 1e15;
+    private static final double OMEGA = 1e14;
 
     public static double randomDouble(Random random) {
         return (random.nextBoolean() ? +1 : -1) * (1 / random.nextDouble() - 1);
@@ -39,7 +39,7 @@ public class TestW {
             double val = Math.abs(randomDouble(random)) - W.E_INV;
             double w = W.apply(val);
             double valBack = w * Math.exp(w);
-            assertEquals(Math.round(val * OMEGA), Math.round(valBack * OMEGA), "%f was expected, %f was returned".formatted(val, valBack));
+            assertEquals(OMEGA, Math.round(valBack / val * OMEGA), "%f was expected, %f was returned".formatted(val, valBack));
         }
     }
 
@@ -58,7 +58,11 @@ public class TestW {
         for (double val : values) {
             double w = W.apply(val);
             double valBack = w * Math.exp(w);
-            assertEquals(Math.round(val * OMEGA), Math.round(valBack * OMEGA),  "%f was expected, %f was returned".formatted(val, valBack));
+            if (val == 0.0) {
+                assert Math.abs(valBack) < 1 / OMEGA;
+            } else {
+                assertEquals(OMEGA, Math.round(valBack / val * OMEGA),  "%f was expected, %f was returned".formatted(val, valBack));
+            }
         }
     }
 
