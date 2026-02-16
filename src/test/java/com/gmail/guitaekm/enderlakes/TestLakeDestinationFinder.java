@@ -496,6 +496,39 @@ public class TestLakeDestinationFinder {
         }
     }
 
+    @Test
+    public void testManualOverflowNearestLakeInvOfPos() {
+        long seed = 6763606376622120131L;
+        LakeDestinationFinder finder = new LakeDestinationFinder(NORMAL_CONFIG);
+        ChunkPos pos = new ChunkPos(750807, 1801978);
+        Set<GridPos> gridPoses = finder.findNearestLake(seed, pos);
+        Set<ChunkPos> chunkPoses = gridPoses.stream().map(gridPos -> finder.pos(seed, gridPos)).collect(Collectors.toSet());
+        assert chunkPoses.contains(pos);
+    }
+
+    @Test
+    public void testAutomaticOverflowNearestLakeInvOfPos() {
+        LakeDestinationFinder finder = new LakeDestinationFinder(NORMAL_CONFIG);
+        Random random = new Random(42);
+        for (int i = 0; i < 100; i++) {
+            long seed = random.nextLong();
+            int coord1 = (random.nextBoolean() ? +1 : -1 ) * random.nextInt(1, 30_000_000);
+            int coord2 = random.nextInt(-30_000_000, +30_000_000);
+            int x, z;
+            if (random.nextBoolean()) {
+                x = coord1;
+                z = coord2;
+            } else {
+                x = coord2;
+                z = coord1;
+            }
+            ChunkPos chunkPos = new ChunkPos(new BlockPos(x, 0, z));
+            Set<GridPos> gridPoses = finder.findNearestLake(seed, chunkPos);
+            Set<ChunkPos> chunkPoses = gridPoses.stream().map(gridPos -> finder.pos(seed, gridPos)).collect(Collectors.toSet());
+            assert chunkPoses.contains(chunkPos);
+        }
+    }
+
     public static void nearestLakeInvOfPosWithSeed(long seed) {
         LakeDestinationFinder finder = new LakeDestinationFinder(NORMAL_CONFIG);
         for (int x = -50; x <= 50; x++) {
