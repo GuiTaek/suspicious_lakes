@@ -3,6 +3,7 @@ package com.gmail.guitaekm.enderlakes;
 import com.gmail.guitaekm.enderlakes.lakes.Structures;
 import net.fabricmc.api.ModInitializer;
 
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.*;
 import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.entity.EntityType;
@@ -10,6 +11,7 @@ import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.BucketItem;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroups;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -76,5 +78,10 @@ public class Enderlakes implements ModInitializer {
 	public void onInitialize() {
         Structures.load();
         WorldBorderConfigUpdater.INSTANCE.register();
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(
+                content -> {
+                    content.add(Enderlakes.SUSPICIOUS_BUCKET);
+                }
+        );
 	}
 }
