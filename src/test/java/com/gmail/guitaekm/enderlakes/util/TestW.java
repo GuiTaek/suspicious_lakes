@@ -15,7 +15,7 @@ public class TestW {
     public static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger("W_tester");
 
     // big number used for testing for approximately equal
-    private static final double OMEGA = (int) 1e15;
+    private static final double OMEGA = 1e15;
 
     public static double randomDouble(Random random) {
         return (random.nextBoolean() ? +1 : -1) * (1 / random.nextDouble() - 1);

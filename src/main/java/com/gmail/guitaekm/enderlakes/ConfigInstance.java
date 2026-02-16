@@ -9,7 +9,9 @@ public class ConfigInstance {
 
     final private double powerDistance;
     final private List<Integer> cycleWeights;
-    final private int minimumDistance;
+    final private double minimumDistance;
+    final private double alpha;
+    final private double lambda;
     final private int lastUnsafeChunk;
 
     private long seed;
@@ -44,6 +46,8 @@ public class ConfigInstance {
                 ConfigValues.powerDistance,
                 ConfigValues.cycleWeights,
                 ConfigValues.minimumDistance,
+                ConfigValues.alpha,
+                ConfigValues.lambda,
                 ConfigValues.lastUnsafeChunkCoord
         );
     }
@@ -51,13 +55,17 @@ public class ConfigInstance {
             NrLakesSource nrLakesSource,
             double powerDistance,
             List<Integer> cycleWeights,
-            int minimumDistance,
+            double minimumDistance,
+            double alpha,
+            double lambda,
             int lastUnsafeChunk
     ) {
         this.powerDistance = powerDistance;
         this.cycleWeights = new ArrayList<>(cycleWeights);
         this.minimumDistance = minimumDistance;
         this.lastUnsafeChunk = lastUnsafeChunk;
+        this.alpha = alpha;
+        this.lambda = lambda;
 
         this.nrLakesSource = nrLakesSource;
         this.sourceChanged = true;
@@ -69,9 +77,7 @@ public class ConfigInstance {
             return;
         }
         switch (this.nrLakesSource.type) {
-            case RAW -> {
-                this.nrLakes = this.nrLakesSource.val;
-            }
+            case RAW -> this.nrLakes = this.nrLakesSource.val;
             case BORDER -> {
                 LakeDestinationFinder finder = new LakeDestinationFinder(this);
                 this.nrLakes = finder.findNewNrLakes(this.nrLakesSource.val, -1);
@@ -105,8 +111,14 @@ public class ConfigInstance {
     public List<Integer> cycleWeights() {
         return new ArrayList<>(this.cycleWeights);
     }
-    public int minimumDistance() {
+    public double minimumDistance() {
         return this.minimumDistance;
+    }
+    public double alpha() {
+        return this.alpha;
+    }
+    public double lambda() {
+        return this.lambda;
     }
     public int[] factsPhi() {
         this.updateNrLakesAndFactsPhi();

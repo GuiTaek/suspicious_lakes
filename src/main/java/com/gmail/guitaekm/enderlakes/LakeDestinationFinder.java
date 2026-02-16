@@ -1,5 +1,6 @@
 package com.gmail.guitaekm.enderlakes;
 
+import com.gmail.guitaekm.enderlakes.util.W;
 import com.google.common.collect.Streams;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.LocalRandom;
@@ -15,7 +16,6 @@ import java.util.function.Function;
 /**
  * Follows math.md to implement the logic in this mod
  */
-@SuppressWarnings("SuspiciousNameCombination")
 public class LakeDestinationFinder {
     final public ConfigInstance config;
     public LakeDestinationFinder(ConfigInstance config) {
@@ -149,14 +149,45 @@ public class LakeDestinationFinder {
         return signum * (int) Math.floor(signum * fRaw(c));
     }
 
-    public double fRaw(int c) {
-        int signum = Integer.compare(c, 0);
-        return signum * config.minimumDistance() * Math.pow(Math.abs(c), config.powerDistance());
+    public double fRaw(double c) {
+        int signum = Double.compare(c, 0);
+        // powerDistance is optimized away (else the equation isn't solvable without guarantees)
+        double absC = Math.abs(c);
+        double d = config.minimumDistance();
+        double polyProportion = absC;
+        assert Math.log(Double.MAX_VALUE) > config.lambda() * absC;
+        double expProportion = Math.exp(config.lambda() * absC);
+        double alpha = config.alpha();
+        assert 0d <= alpha;
+        assert alpha <= 1d;
+        double beta = 1 - config.alpha();
+        return signum * d * (alpha * polyProportion + beta * expProportion);
     }
 
-    public double fInvRaw(int c) {
-        int signum = Integer.compare(c, 0);
-        return signum * Math.pow((double) Math.abs(c) / config.minimumDistance(), 1d / config.powerDistance());
+    public double fInvRaw(double fC) {
+        if (fC == 0.0) {
+            return 0.0;
+        }
+        // see https://en.wikipedia.org/wiki/Lambert_W_function#Applications for how to solve it
+        int signum = Double.compare(fC, 0);
+        fC = Math.abs(fC);
+        double d = config.minimumDistance();
+        double lambda = config.lambda();
+        double alpha = config.alpha();
+        double beta = 1 - config.alpha();
+        assert alpha >= 0d;
+        if (alpha == 0d) {
+            // now f(c) == d * exp(lambda * c)
+            return signum * Math.log(fC / d) / lambda;
+        }
+        assert alpha <= 1d;
+        if (alpha == 1d) {
+            // now f(c) == d * c
+            return signum * fC / d;
+        }
+        double term = (fC + beta * d) / alpha / d;
+        double wInput = -beta / alpha * lambda * Math.exp(term * lambda);
+        return signum * (term - W.apply(wInput) / lambda);
     }
 
     public int fInv(int c) {
@@ -511,10 +542,6 @@ public class LakeDestinationFinder {
         int coord = config.lastUnsafeChunk();
         assert coord >= 0;
         GridPos offset = new GridPos(0, 0);
-        if (fRound(fInvCeil(config.lastUnsafeChunk())) == config.lastUnsafeChunk() ) {
-            // probably need a new function for that
-            offset = new GridPos(1, -1);
-        }
         ChunkPos pos = lastPos(new ChunkPos(coord, coord));
         GridPos rawLastPos = getFloorRawGridUnsafe(pos);
         GridPos refinedPos = new GridPos(rawLastPos.x + offset.x, rawLastPos.y + offset.y);

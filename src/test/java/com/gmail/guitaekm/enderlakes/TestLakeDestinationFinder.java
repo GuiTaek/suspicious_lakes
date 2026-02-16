@@ -30,6 +30,8 @@ public class TestLakeDestinationFinder {
             NORMAL_CONFIG.powerDistance(),
             NORMAL_CONFIG.cycleWeights(),
             NORMAL_CONFIG.minimumDistance(),
+            NORMAL_CONFIG.alpha(),
+            NORMAL_CONFIG.lambda(),
             900
     );
 
@@ -40,8 +42,13 @@ public class TestLakeDestinationFinder {
                     1, 4, 3, 4, 0, 6
             ),
             ConfigValues.minimumDistance,
+            ConfigValues.alpha,
+            ConfigValues.lambda,
             100
     );
+
+    // big number used for testing for approximately equal
+    private static final double OMEGA = 1e14;
 
     @Test
     public void testPiManually() {
@@ -78,6 +85,8 @@ public class TestLakeDestinationFinder {
                     config.powerDistance(),
                     config.cycleWeights(),
                     config.minimumDistance(),
+                    config.alpha(),
+                    config.lambda(),
                     0
             );
             LakeDestinationFinder finder = new LakeDestinationFinder(newConfig);
@@ -253,6 +262,8 @@ public class TestLakeDestinationFinder {
                     NORMAL_CONFIG.powerDistance(),
                     NORMAL_CONFIG.cycleWeights(),
                     NORMAL_CONFIG.minimumDistance(),
+                    NORMAL_CONFIG.alpha(),
+                    NORMAL_CONFIG.lambda(),
                     lastUnsafeChunk
             );
             int o = new LakeDestinationFinder(config).lastUnsafeInteger();
@@ -281,6 +292,8 @@ public class TestLakeDestinationFinder {
                 config.powerDistance(),
                 config.cycleWeights(),
                 config.minimumDistance(),
+                config.alpha(),
+                config.lambda(),
                 lastUnsafeChunk
         );
     }
@@ -372,9 +385,9 @@ public class TestLakeDestinationFinder {
             if (Math.abs(c) < 2) {
                 continue;
             }
-            int fC = finder.fRound(c);
-            int signum = Integer.compare(fC, 0);
-            assertEquals(c - signum, finder.fInvFloor(fC - signum));
+            int fC = finder.fFloor(c);
+            int signum = Double.compare(fC, 0);
+            assertEquals(c - signum,  finder.fInvFloor(fC - signum));
             assertEquals(c, finder.fInvFloor(fC + signum));
         }
     }
@@ -393,8 +406,62 @@ public class TestLakeDestinationFinder {
         }
     }
 
+    public void fInvRawInvFRaw(ConfigInstance config) {
+        LakeDestinationFinder finder = new LakeDestinationFinder(config);
+        for (int c = -350; c <= 350; c++) {
+            double fC = finder.fRaw(c);
+            double cBack = finder.fInvRaw(fC);
+            if (c == 0) {
+                assert Math.abs(cBack) < 1 / OMEGA;
+            } else {
+                assertEquals(OMEGA, Math.round(cBack / c * OMEGA), "%d was expected, %f was returned".formatted(c, cBack));
+            }
+        }
+        Random random = new Random(42);
+        for (int i = 0; i < 1_000; i++) {
+            double blockC = random.nextDouble(30_000_000);
+            double gridC = finder.fInvRaw(blockC);
+            double blockCBack = finder.fRaw(gridC);
+            if (blockC == 0.0) {
+                assert Math.abs(blockCBack) < 1 / OMEGA;
+            } else {
+                assertEquals(
+                        OMEGA,
+                        Math.round(blockCBack / blockC * OMEGA),
+                        "%f was expected, %f was returned".formatted(blockC, blockCBack)
+                );
+
+            }
+        }
+    }
     @Test
-    public void fInvCeilAboveF() {
+    public void fInvRawInvFRaw() {
+        fInvRawInvFRaw(NORMAL_CONFIG);
+        fInvRawInvFRaw(MIDDLE_CONFIG);
+        fInvRawInvFRaw(SMALL_CONFIG);
+    }
+
+    public void fRawSameSignumAsC(ConfigInstance config) {
+        LakeDestinationFinder finder = new LakeDestinationFinder(config);
+        Random random = new Random(42);
+        for (int i = 0; i < 1_000; i++) {
+            double c = random.nextDouble(-400, +400);
+            assertEquals(Double.compare(c, 0), Double.compare(finder.fRaw(c), 0));
+        }
+        for (int c = -350; c <= 350; c++) {
+            assertEquals(Integer.signum(c), Double.compare(finder.fRaw(c), 0));
+        }
+    }
+
+    @Test
+    public void fRawSameSignumAsC() {
+        fRawSameSignumAsC(NORMAL_CONFIG);
+        fRawSameSignumAsC(MIDDLE_CONFIG);
+        fRawSameSignumAsC(SMALL_CONFIG);
+    }
+
+    @Test
+    public void fInvCeilAboveFRound() {
         LakeDestinationFinder finder = new LakeDestinationFinder(NORMAL_CONFIG);
         for (int c = -350; c <= 350; c++) {
             if (Math.abs(c) < 2) {

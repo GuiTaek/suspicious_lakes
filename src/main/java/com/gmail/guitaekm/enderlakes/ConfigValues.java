@@ -10,6 +10,8 @@ public class ConfigValues {
     );
     public static final int[] factsPhi = new int[] { 2, 21222611 };
 
-    public static final int minimumDistance = 2;
+    public static final double minimumDistance = 3;
+    public static final double alpha = 1.0;
+    public static final double lambda = 1e-8;
     public static final int lastUnsafeChunkCoord = 64;
 }
