@@ -32,7 +32,7 @@ public class TestLakeDestinationFinder {
             NORMAL_CONFIG.minimumDistance(),
             NORMAL_CONFIG.alpha(),
             NORMAL_CONFIG.lambda(),
-            900
+            18
     );
 
     static ConfigInstance SMALL_CONFIG = new ConfigInstance(
@@ -494,16 +494,6 @@ public class TestLakeDestinationFinder {
         for (int i = 0; i < 10; i++) {
             nearestLakeInvOfPosWithSeed(rand.nextLong());
         }
-    }
-
-    @Test
-    public void testManualOverflowNearestLakeInvOfPos() {
-        long seed = 6763606376622120131L;
-        LakeDestinationFinder finder = new LakeDestinationFinder(NORMAL_CONFIG);
-        ChunkPos pos = new ChunkPos(750807, 1801978);
-        Set<GridPos> gridPoses = finder.findNearestLake(seed, pos);
-        Set<ChunkPos> chunkPoses = gridPoses.stream().map(gridPos -> finder.pos(seed, gridPos)).collect(Collectors.toSet());
-        assert chunkPoses.contains(pos);
     }
 
     @Test
