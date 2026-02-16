@@ -188,6 +188,11 @@ public class LakeDestinationFinder {
         return signum * (int) Math.ceil(signum * fInvRaw(c));
     }
 
+    public int median(int border) {
+        int toC = this.fInv(border);
+        return this.fRound(toC / 2);
+    }
+
     /**
      * generates a prime needed for this whole math depending on the world border
      * @param border the distance in x or z direction from the border to spawn
@@ -205,6 +210,8 @@ public class LakeDestinationFinder {
         GridPos gridPos = signum == -1 ? new GridPos(fInvFloor(maxChunk.x), fInvFloor(maxChunk.z))
                 : new GridPos(fInvCeil(maxChunk.x), fInvCeil(maxChunk.z));
         int rawMappedNumber = cInv(gridPos);
+
+        //when this fails, it means the border is smaller than the last safe chunk
         assert rawMappedNumber > o;
         BigInteger prime = BigInteger.valueOf(rawMappedNumber - o);
         while (!prime.isProbablePrime(1_000)) {
