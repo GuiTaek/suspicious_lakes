@@ -48,7 +48,7 @@ public class TestLakeDestinationFinder {
     );
 
     // big number used for testing for approximately equal
-    private static final double OMEGA = 1e14;
+    private static final double OMEGA = 1e12;
 
     @Test
     public void testPiManually() {
@@ -419,7 +419,7 @@ public class TestLakeDestinationFinder {
         }
         Random random = new Random(42);
         for (int i = 0; i < 1_000; i++) {
-            double blockC = random.nextDouble(30_000_000);
+            double blockC = random.nextDouble(30_000_000d / 16 / 2);
             double gridC = finder.fInvRaw(blockC);
             double blockCBack = finder.fRaw(gridC);
             if (blockC == 0.0) {

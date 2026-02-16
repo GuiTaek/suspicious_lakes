@@ -10,8 +10,10 @@ public class ConfigValues {
     );
     public static final int[] factsPhi = new int[] { 2, 21222611 };
 
-    public static final double minimumDistance = 3;
-    public static final double alpha = 1.0;
-    public static final double lambda = 1e-8;
+    public static final double minimumDistance = 16;
+    public static final double alpha = 0.5;
+
+    //better don't touch this value, it's so difficult to balance so the game doesn't crash immediately
+    public static final double lambda = 5e-3;
     public static final int lastUnsafeChunkCoord = 64;
 }

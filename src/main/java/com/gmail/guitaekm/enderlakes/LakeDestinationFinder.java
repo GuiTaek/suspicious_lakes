@@ -151,12 +151,12 @@ public class LakeDestinationFinder {
 
     public double fRaw(double c) {
         int signum = Double.compare(c, 0);
-        // powerDistance is optimized away (else the equation isn't solvable without guarantees)
+        // powerDistance is optimized away (else the equation isn't solvable with guarantees)
         double absC = Math.abs(c);
         double d = config.minimumDistance();
         double polyProportion = absC;
         assert Math.log(Double.MAX_VALUE) > config.lambda() * absC;
-        double expProportion = Math.exp(config.lambda() * absC);
+        double expProportion = Math.exp(config.lambda() * absC) - 1;
         double alpha = config.alpha();
         assert 0d <= alpha;
         assert alpha <= 1d;
@@ -185,9 +185,12 @@ public class LakeDestinationFinder {
             // now f(c) == d * c
             return signum * fC / d;
         }
-        double term = (fC + beta * d) / alpha / d;
-        double wInput = -beta / alpha * lambda * Math.exp(term * lambda);
-        return signum * (term - W.apply(wInput) / lambda);
+        double a = (fC + beta * d) / alpha / d;
+        double b = -beta / alpha;
+        double c = lambda;
+        assert Math.log(Double.MAX_VALUE) > a * c;
+        double wInput = -b * c * Math.exp(a * c);
+        return signum * (a - 1 / c * W.apply(wInput));
     }
 
     public int fInv(int c) {
@@ -544,6 +547,13 @@ public class LakeDestinationFinder {
         GridPos offset = new GridPos(0, 0);
         ChunkPos pos = lastPos(new ChunkPos(coord, coord));
         GridPos rawLastPos = getFloorRawGridUnsafe(pos);
+
+        // this happens when fInvRaw(coord) is near a full number, meaning an integer n and
+        // a small positive float epsilon:
+        // coord == n - epsilon
+        if (fFloor(fInvFloor(coord) + 1) <= coord) {
+            offset = new GridPos(1, -1);
+        }
         GridPos refinedPos = new GridPos(rawLastPos.x + offset.x, rawLastPos.y + offset.y);
 
         assert refinedPos.x == -refinedPos.y;
