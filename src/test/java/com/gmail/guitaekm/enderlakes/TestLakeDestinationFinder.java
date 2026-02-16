@@ -522,10 +522,12 @@ public class TestLakeDestinationFinder {
                 x = coord2;
                 z = coord1;
             }
-            ChunkPos chunkPos = new ChunkPos(new BlockPos(x, 0, z));
-            Set<GridPos> gridPoses = finder.findNearestLake(seed, chunkPos);
-            Set<ChunkPos> chunkPoses = gridPoses.stream().map(gridPos -> finder.pos(seed, gridPos)).collect(Collectors.toSet());
-            assert chunkPoses.contains(chunkPos);
+            ChunkPos rawChunkPos = new ChunkPos(new BlockPos(x, 0, z));
+            Set<GridPos> gridPoses = finder.findNearestLake(seed, rawChunkPos);
+            GridPos gridPos = gridPoses.stream().toList().get(random.nextInt(gridPoses.size()));
+            ChunkPos refinedChunkPos = finder.pos(seed, gridPos);
+            Set<GridPos> gridPosBack = finder.findNearestLake(seed, refinedChunkPos);
+            assert gridPosBack.contains(gridPos);
         }
     }
 
