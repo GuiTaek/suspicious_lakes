@@ -356,20 +356,21 @@ public class LakeDestinationFinder {
 
     public Set<GridPos> findNearestLake(long seed, ChunkPos pos) {
         GridPos basePos = getRawGridPos(pos);
-        int nearestDistanceSquared = Integer.MAX_VALUE;
+        long nearestDistanceSquared = Long.MAX_VALUE;
         HashSet<GridPos> nearestLake = new HashSet<>();
         // the offset of pos relative to rawPos is inside a 2x2 GridPos-Rectangle, therefore -2 to +2
         for (int xDiff = -2; xDiff <= +2; xDiff++) {
             for (int yDiff = -2; yDiff <= +2; yDiff++) {
                 GridPos currGridPos = new GridPos(basePos.x + xDiff, basePos.y + yDiff);
-                // todo: better test for unsafe Chunk instead of catching an error
-                try {
-                    rawPos(currGridPos);
-                } catch (IllegalArgumentException exc) {
+                if (!this.isSafeChunk(this.rawPosCeilUnsafe(currGridPos))) {
                     continue;
                 }
-                int currDistanceSquared = pos(seed, currGridPos)
-                        .getSquaredDistance(pos);
+                ChunkPos currChunkPos = pos(seed, currGridPos);
+                // yes, there exists currChunkPos.getSquaredDistance()
+                // but it flows over
+                long dx = currChunkPos.x - pos.x;
+                long dz = currChunkPos.z - pos.z;
+                long currDistanceSquared = dx * dx + dz * dz;
                 if (currDistanceSquared == nearestDistanceSquared) {
                     nearestLake.add(currGridPos);
                 }
