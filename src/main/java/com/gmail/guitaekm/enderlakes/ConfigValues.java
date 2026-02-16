@@ -10,7 +10,7 @@ public class ConfigValues {
     );
     public static final int[] factsPhi = new int[] { 2, 21222611 };
 
-    public static final double minimumDistance = 16;
+    public static final double minimumDistance = 32;
     public static final double alpha = 0.5;
 
     //better don't touch this value, it's so difficult to balance so the game doesn't crash immediately

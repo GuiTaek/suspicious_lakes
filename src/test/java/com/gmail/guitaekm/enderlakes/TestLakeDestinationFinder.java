@@ -691,7 +691,7 @@ public class TestLakeDestinationFinder {
         for (int i = 0; i < 3; i++) {
             int g = LakeDestinationFinder.calculateG(NORMAL_CONFIG.nrLakes(), NORMAL_CONFIG.factsPhi(), random.nextLong());
             int gInv = LakeDestinationFinder.calculateInv(NORMAL_CONFIG.nrLakes(), g);
-            int boundary = finder.fInv((int)(Math.sqrt(NORMAL_CONFIG.nrLakes()) + 0.5));
+            int boundary = finder.fInvFloor(30_000_000 / 16 / 2);
             testAbstractCycles(
                     () -> {
                         int coord1 = random.nextInt(-boundary, boundary);
@@ -911,5 +911,19 @@ public class TestLakeDestinationFinder {
         testTeleportAimNeverUnsafeWithConfig(random, NORMAL_CONFIG);
         testTeleportAimNeverUnsafeWithConfig(random, MIDDLE_CONFIG);
         testTeleportAimNeverUnsafeWithConfig(random, SMALL_CONFIG);
+    }
+
+    public void testFDerivativeAlwaysGreater1(ConfigInstance config) {
+        LakeDestinationFinder finder = new LakeDestinationFinder(config);
+        for (int c = -100; c <= +100; c++) {
+            assert finder.fRound(c + 1) - finder.fRound(c) >= 1;
+        }
+    }
+
+    @Test
+    public void testFDerivativeAlwaysGreater1() {
+        testFDerivativeAlwaysGreater1(NORMAL_CONFIG);
+        testFDerivativeAlwaysGreater1(MIDDLE_CONFIG);
+        testFDerivativeAlwaysGreater1(SMALL_CONFIG);
     }
 }

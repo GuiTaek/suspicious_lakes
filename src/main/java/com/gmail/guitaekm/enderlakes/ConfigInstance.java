@@ -42,7 +42,7 @@ public class ConfigInstance {
 
     public ConfigInstance() {
         this(
-                rawSource(ConfigValues.nrLakes),
+                borderSource(30_000_000),
                 ConfigValues.powerDistance,
                 ConfigValues.cycleWeights,
                 ConfigValues.minimumDistance,

@@ -151,17 +151,13 @@ public class LakeDestinationFinder {
 
     public double fRaw(double c) {
         int signum = Double.compare(c, 0);
-        // powerDistance is optimized away (else the equation isn't solvable with guarantees)
         double absC = Math.abs(c);
         double d = config.minimumDistance();
-        double polyProportion = absC;
+        double e = config.powerDistance();
+        double polyProportion = Math.pow(absC, e);
         assert Math.log(Double.MAX_VALUE) > config.lambda() * absC;
-        double expProportion = Math.exp(config.lambda() * absC) - 1;
-        double alpha = config.alpha();
-        assert 0d <= alpha;
-        assert alpha <= 1d;
-        double beta = 1 - config.alpha();
-        return signum * d * (alpha * polyProportion + beta * expProportion);
+        double expProportion = Math.exp(config.lambda() * absC);
+        return signum * d * polyProportion * expProportion;
     }
 
     public double fInvRaw(double fC) {
@@ -172,25 +168,10 @@ public class LakeDestinationFinder {
         int signum = Double.compare(fC, 0);
         fC = Math.abs(fC);
         double d = config.minimumDistance();
+        double e = config.powerDistance();
         double lambda = config.lambda();
-        double alpha = config.alpha();
-        double beta = 1 - config.alpha();
-        assert alpha >= 0d;
-        if (alpha == 0d) {
-            // now f(c) == d * exp(lambda * c)
-            return signum * Math.log(fC / d) / lambda;
-        }
-        assert alpha <= 1d;
-        if (alpha == 1d) {
-            // now f(c) == d * c
-            return signum * fC / d;
-        }
-        double a = (fC + beta * d) / alpha / d;
-        double b = -beta / alpha;
-        double c = lambda;
-        assert Math.log(Double.MAX_VALUE) > a * c;
-        double wInput = -b * c * Math.exp(a * c);
-        return signum * (a - 1 / c * W.apply(wInput));
+        double wInput = lambda / e * Math.pow(fC / d, 1 / e);
+        return signum * e / lambda * W.apply(wInput);
     }
 
     public int fInv(int c) {
