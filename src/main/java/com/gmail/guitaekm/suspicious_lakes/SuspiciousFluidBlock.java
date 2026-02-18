@@ -1,4 +1,4 @@
-package com.gmail.guitaekm.enderlakes;
+package com.gmail.guitaekm.suspicious_lakes;
 
 import net.minecraft.block.*;
 import net.minecraft.entity.Entity;
@@ -34,7 +34,7 @@ public class SuspiciousFluidBlock extends FluidBlock {
     }
 
     public void updateActivated(BlockState state, World world, BlockPos pos) {
-        boolean activated = world.getBiome(pos).isIn(Enderlakes.HAS_STRUCTURE_SUSPICIOUS_LAKE);
+        boolean activated = world.getBiome(pos).isIn(SuspiciousLakes.HAS_STRUCTURE_SUSPICIOUS_LAKE);
         world.setBlockState(pos, state.with(ACTIVATED, activated));
     }
 
@@ -74,7 +74,7 @@ public class SuspiciousFluidBlock extends FluidBlock {
             if (entity == null) {
                 return collisionShape;
             }
-            if (entity.getType().isIn(Enderlakes.PERMEABLE_BY_SUSPICIOUS_FLUID)) {
+            if (entity.getType().isIn(SuspiciousLakes.PERMEABLE_BY_SUSPICIOUS_FLUID)) {
                 Box shrunkenRawShape = collisionShape
                         .getBoundingBox().contract(0.01);
                 if (!(world instanceof ServerWorld serverWorld)) {
@@ -106,7 +106,7 @@ public class SuspiciousFluidBlock extends FluidBlock {
                 .offset(pos.getX(), pos.getY(), pos.getZ());
 
         Box boundingBox = entity.calculateBoundingBox();
-        if (entity.getType().isIn(Enderlakes.PERMEABLE_BY_SUSPICIOUS_FLUID)) {
+        if (entity.getType().isIn(SuspiciousLakes.PERMEABLE_BY_SUSPICIOUS_FLUID)) {
             // the stretch is because minecraft predicts collision before actually moving, and this is how it does that
             // and because the ender pearl vanishes on collision, we have to mimic the code
             boundingBox = boundingBox.stretch(entity.getVelocity());
@@ -124,11 +124,11 @@ public class SuspiciousFluidBlock extends FluidBlock {
             return false;
         }
         long seed = Objects.requireNonNull(world.getServer()).getOverworld().getSeed();
-        Enderlakes.finder.config.setSeed(seed);
-        int g = Enderlakes.finder.config.g();
-        int gInv = Enderlakes.finder.config.gInv();
+        SuspiciousLakes.finder.config.setSeed(seed);
+        int g = SuspiciousLakes.finder.config.g();
+        int gInv = SuspiciousLakes.finder.config.gInv();
         // todo: check if random is seed dependent
-        ChunkPos destChunk = Enderlakes.finder.safeTeleportAim(world, new ChunkPos(fromPos), world.getRandom(), g, gInv, seed);
+        ChunkPos destChunk = SuspiciousLakes.finder.safeTeleportAim(world, new ChunkPos(fromPos), world.getRandom(), g, gInv, seed);
         if (destChunk == null) {
             return false;
         }
@@ -154,14 +154,14 @@ public class SuspiciousFluidBlock extends FluidBlock {
                 );
         lakeTopLayer = lakeTopLayer != -1 ? lakeTopLayer : world.getRandom().nextBetween(1, world.getTopY());
         BlockPos emergencyLake = toPosRaw.withY(lakeTopLayer);
-        if (!chunk.getBlockState(emergencyLake).getBlock().equals(Enderlakes.SUSPICIOUS_LIQUID_BLOCK)) {
-            chunk.setBlockState(emergencyLake, Enderlakes.SUSPICIOUS_LIQUID_BLOCK.getDefaultState(), false);
+        if (!chunk.getBlockState(emergencyLake).getBlock().equals(SuspiciousLakes.SUSPICIOUS_LIQUID_BLOCK)) {
+            chunk.setBlockState(emergencyLake, SuspiciousLakes.SUSPICIOUS_LIQUID_BLOCK.getDefaultState(), false);
             for (Direction dir: Direction.values()) {
                 if (dir.equals(Direction.UP)) {
                     continue;
                 }
                 BlockPos endstonePos = emergencyLake.add(dir.getVector());
-                if (chunk.getBlockState(endstonePos).isIn(Enderlakes.REPLACEABLE_BY_SUSPICIOUS_LAKES)) {
+                if (chunk.getBlockState(endstonePos).isIn(SuspiciousLakes.REPLACEABLE_BY_SUSPICIOUS_LAKES)) {
                     chunk.setBlockState(endstonePos, Blocks.END_STONE.getDefaultState(), false);
                 }
             }
@@ -215,12 +215,12 @@ public class SuspiciousFluidBlock extends FluidBlock {
     }
 
     @Override public boolean receiveNeighborFluids(World world, BlockPos pos, BlockState state) {
-        if (world.getFluidState(pos).isIn(Enderlakes.SUSPICIOUS_LIQUID)) {
+        if (world.getFluidState(pos).isIn(SuspiciousLakes.SUSPICIOUS_LIQUID)) {
             boolean bl = world.getBlockState(pos.down()).isOf(Blocks.BEDROCK);
 
             for (Direction direction : FLOW_DIRECTIONS) {
                 BlockPos blockPos = pos.offset(direction.getOpposite());
-                if (world.getFluidState(blockPos).isIn(FluidTags.WATER) && !world.getFluidState(blockPos).isIn(Enderlakes.SUSPICIOUS_LIQUID)) {
+                if (world.getFluidState(blockPos).isIn(FluidTags.WATER) && !world.getFluidState(blockPos).isIn(SuspiciousLakes.SUSPICIOUS_LIQUID)) {
                     Block block = Blocks.END_STONE;
                     world.setBlockState(pos, block.getDefaultState());
                     this.playExtinguishSound(world, pos);

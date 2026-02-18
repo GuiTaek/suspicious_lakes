@@ -1,6 +1,6 @@
-package com.gmail.guitaekm.enderlakes;
+package com.gmail.guitaekm.suspicious_lakes;
 
-import com.gmail.guitaekm.enderlakes.lakes.Structures;
+import com.gmail.guitaekm.suspicious_lakes.lakes.Structures;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
@@ -23,7 +23,7 @@ import net.minecraft.world.biome.Biome;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Enderlakes implements ModInitializer {
+public class SuspiciousLakes implements ModInitializer {
 	public static final String MOD_ID = "suspicious_lakes";
 
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
@@ -80,7 +80,7 @@ public class Enderlakes implements ModInitializer {
         WorldBorderConfigUpdater.INSTANCE.register();
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(
                 content -> {
-                    content.add(Enderlakes.SUSPICIOUS_BUCKET);
+                    content.add(SuspiciousLakes.SUSPICIOUS_BUCKET);
                 }
         );
 	}

@@ -1,13 +1,11 @@
-package com.gmail.guitaekm.enderlakes;
+package com.gmail.guitaekm.suspicious_lakes;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.FluidBlock;
 import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.Item;
-import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.state.StateManager;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -25,12 +23,12 @@ abstract public class SuspiciousFluid extends FlowableFluid {
     }
     @Override
     public Fluid getFlowing() {
-        return Enderlakes.SUSPICIOUS_LIQUID_FLOWING_FLUID;
+        return SuspiciousLakes.SUSPICIOUS_LIQUID_FLOWING_FLUID;
     }
 
     @Override
     public Fluid getStill() {
-        return Enderlakes.SUSPICIOUS_LIQUID_STILL_FLUID;
+        return SuspiciousLakes.SUSPICIOUS_LIQUID_STILL_FLUID;
     }
 
     @Override
@@ -56,7 +54,7 @@ abstract public class SuspiciousFluid extends FlowableFluid {
 
     @Override
     public Item getBucketItem() {
-        return Enderlakes.SUSPICIOUS_BUCKET;
+        return SuspiciousLakes.SUSPICIOUS_BUCKET;
     }
 
     @Override
@@ -76,7 +74,7 @@ abstract public class SuspiciousFluid extends FlowableFluid {
 
     @Override
     protected BlockState toBlockState(FluidState state) {
-        return Enderlakes.SUSPICIOUS_LIQUID_BLOCK.getDefaultState().with(FluidBlock.LEVEL, getBlockStateLevel(state));
+        return SuspiciousLakes.SUSPICIOUS_LIQUID_BLOCK.getDefaultState().with(FluidBlock.LEVEL, getBlockStateLevel(state));
     }
     @Override
     protected boolean receivesFlow(Direction face, BlockView world, BlockPos pos, BlockState state, BlockPos fromPos, BlockState fromState) {

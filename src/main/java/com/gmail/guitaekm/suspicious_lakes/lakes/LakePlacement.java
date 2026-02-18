@@ -1,7 +1,7 @@
-package com.gmail.guitaekm.enderlakes.lakes;
+package com.gmail.guitaekm.suspicious_lakes.lakes;
 
-import com.gmail.guitaekm.enderlakes.Enderlakes;
-import com.gmail.guitaekm.enderlakes.LakeDestinationFinder;
+import com.gmail.guitaekm.suspicious_lakes.SuspiciousLakes;
+import com.gmail.guitaekm.suspicious_lakes.LakeDestinationFinder;
 import com.mojang.datafixers.util.Unit;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -35,12 +35,12 @@ public class LakePlacement extends RandomSpreadStructurePlacement {
     @Override
     protected boolean isStartChunk(StructurePlacementCalculator calculator, int chunkX, int chunkZ) {
         // todo: switch to chunkRandom
-        Set<LakeDestinationFinder.GridPos> positions = Enderlakes.finder.findNearestLake(
+        Set<LakeDestinationFinder.GridPos> positions = SuspiciousLakes.finder.findNearestLake(
                 calculator.getStructureSeed(),
                 new ChunkPos(chunkX, chunkZ)
         );
         for (LakeDestinationFinder.GridPos pos : positions) {
-            ChunkPos chunkPos = Enderlakes.finder.pos(calculator.getStructureSeed(), pos);
+            ChunkPos chunkPos = SuspiciousLakes.finder.pos(calculator.getStructureSeed(), pos);
             if (chunkPos.x == chunkX && chunkPos.z == chunkZ) {
                 return true;
             }

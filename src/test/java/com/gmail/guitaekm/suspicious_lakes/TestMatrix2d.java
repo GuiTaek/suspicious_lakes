@@ -1,4 +1,4 @@
-package com.gmail.guitaekm.enderlakes;
+package com.gmail.guitaekm.suspicious_lakes;
 
 import org.junit.jupiter.api.Test;
 

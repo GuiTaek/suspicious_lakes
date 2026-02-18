@@ -1,4 +1,4 @@
-package com.gmail.guitaekm.enderlakes;
+package com.gmail.guitaekm.suspicious_lakes;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.minecraft.world.World;
@@ -20,7 +20,7 @@ public class WorldBorderConfigUpdater implements WorldBorderListener {
                 this.borderFinished = LocalDateTime.now();
                 WorldBorder border = world.getWorldBorder();
                 border.addListener(this);
-                Enderlakes.finder.config.setNrLakesSource(ConfigInstance.borderSource((int)border.getSize()));
+                SuspiciousLakes.finder.config.setNrLakesSource(ConfigInstance.borderSource((int)border.getSize()));
             }
         });
     }
@@ -35,12 +35,12 @@ public class WorldBorderConfigUpdater implements WorldBorderListener {
                 .plusSeconds(time / 1_000)
                 .plusNanos((time % 1_000) * 1_000_000);
 
-        Enderlakes.finder.config.setNrLakesSource(ConfigInstance.borderSource((int) toSize));
+        SuspiciousLakes.finder.config.setNrLakesSource(ConfigInstance.borderSource((int) toSize));
     }
 
     @Override
     public void onSizeChange(WorldBorder border, double size) {
-        Enderlakes.finder.config.setNrLakesSource(ConfigInstance.borderSource((int)size));
+        SuspiciousLakes.finder.config.setNrLakesSource(ConfigInstance.borderSource((int)size));
     }
 
     @Override

@@ -1,13 +1,12 @@
-package com.gmail.guitaekm.enderlakes;
+package com.gmail.guitaekm.suspicious_lakes;
 
-import com.gmail.guitaekm.enderlakes.util.W;
+import com.gmail.guitaekm.suspicious_lakes.util.W;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.util.Random;
-import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 

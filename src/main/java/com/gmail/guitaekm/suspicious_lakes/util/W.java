@@ -1,4 +1,4 @@
-package com.gmail.guitaekm.enderlakes.util;
+package com.gmail.guitaekm.suspicious_lakes.util;
 
 import java.util.HashMap;
 import java.util.Map;

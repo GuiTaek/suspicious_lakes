@@ -1,6 +1,6 @@
-package com.gmail.guitaekm.enderlakes;
+package com.gmail.guitaekm.suspicious_lakes;
 
-import com.gmail.guitaekm.enderlakes.util.W;
+import com.gmail.guitaekm.suspicious_lakes.util.W;
 import com.google.common.collect.Streams;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.LocalRandom;
@@ -603,7 +603,7 @@ public class LakeDestinationFinder {
             currPos = teleportAim(currPos, minecraftRandom, g, gInv, seed);
             if (counter > config.cycleWeights().size()) {
                 // some fail-safe if someone enters a lake outside the border and none of the cycle is within
-                Enderlakes.LOGGER.warn("Somehow a suspicious lake was used that lead nowhere inside the border. If you " +
+                SuspiciousLakes.LOGGER.warn("Somehow a suspicious lake was used that lead nowhere inside the border. If you " +
                         "can reproduce it, please message the author of the Mod \"Suspicious Lakes\"");
                 return null;
             }

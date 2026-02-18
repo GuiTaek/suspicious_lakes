@@ -1,31 +1,31 @@
 {
 	"schemaVersion": 1,
-	"id": "enderlakes",
+	"id": "suspicious_lakes",
 	"version": "${version}",
-	"name": "enderlakes",
+	"name": "Suspicious Lakes",
 	"description": "This is an example description! Tell everyone what your mod is about!",
 	"authors": [
-		"Me!"
+		"GuiTaek"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
 		"sources": "https://github.com/FabricMC/fabric-example-mod"
 	},
 	"license": "CC0-1.0",
-	"icon": "assets/enderlakes/icon.png",
+	"icon": "assets/suspicious_lakes/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.gmail.guitaekm.enderlakes.Enderlakes"
+          "com.gmail.guitaekm.suspicious_lakes.SuspiciousLakes"
 		],
 		"client": [
-			"com.gmail.guitaekm.enderlakes.EnderlakesClient"
+			"com.gmail.guitaekm.suspicious_lakes.SuspiciousLakesClient"
 		]
 	},
 	"mixins": [
-		"enderlakes.mixins.json",
+      "suspicious_lakes.mixins.json",
 		{
-			"config": "enderlakes.client.mixins.json",
+			"config": "suspicious_lakes.client.mixins.json",
 			"environment": "client"
 		}
 	],

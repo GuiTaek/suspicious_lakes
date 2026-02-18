@@ -1,4 +1,4 @@
-package com.gmail.guitaekm.enderlakes;
+package com.gmail.guitaekm.suspicious_lakes;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

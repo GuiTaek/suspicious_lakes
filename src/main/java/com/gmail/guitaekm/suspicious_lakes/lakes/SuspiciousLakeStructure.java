@@ -1,4 +1,4 @@
-package com.gmail.guitaekm.enderlakes.lakes;
+package com.gmail.guitaekm.suspicious_lakes.lakes;
 
 import com.google.common.collect.Lists;
 import com.mojang.serialization.MapCodec;

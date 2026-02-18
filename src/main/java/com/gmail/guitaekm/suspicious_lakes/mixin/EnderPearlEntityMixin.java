@@ -1,9 +1,9 @@
-package com.gmail.guitaekm.enderlakes.mixin;
+package com.gmail.guitaekm.suspicious_lakes.mixin;
 
 /// suggested by ChatGPT in case ender pearl breaks some of its cautious pearl broken tests
 /// not necessary for 1.21 but because ender pearls did change in later versions a lot will keep it
 
-import com.gmail.guitaekm.enderlakes.Enderlakes;
+import com.gmail.guitaekm.suspicious_lakes.SuspiciousLakes;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
@@ -32,10 +32,10 @@ public abstract class EnderPearlEntityMixin extends ThrownItemEntity {
         World world = this.getWorld();
         BlockPos pos = blockHit.getBlockPos();
         BlockState state = world.getBlockState(pos);
-        if (!Enderlakes.SUSPICIOUS_LIQUID_BLOCK.shouldTeleport(this, state, pos)) {
+        if (!SuspiciousLakes.SUSPICIOUS_LIQUID_BLOCK.shouldTeleport(this, state, pos)) {
             return;
         }
-        boolean success = Enderlakes.SUSPICIOUS_LIQUID_BLOCK.teleport(this.getWorld(), this, pos);
+        boolean success = SuspiciousLakes.SUSPICIOUS_LIQUID_BLOCK.teleport(this.getWorld(), this, pos);
         if (!success) {
             return;
         }

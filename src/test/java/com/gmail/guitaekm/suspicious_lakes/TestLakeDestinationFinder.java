@@ -1,6 +1,6 @@
-package com.gmail.guitaekm.enderlakes;
+package com.gmail.guitaekm.suspicious_lakes;
 
-import com.gmail.guitaekm.enderlakes.LakeDestinationFinder.GridPos;
+import com.gmail.guitaekm.suspicious_lakes.LakeDestinationFinder.GridPos;
 import net.minecraft.util.math.BlockPos;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

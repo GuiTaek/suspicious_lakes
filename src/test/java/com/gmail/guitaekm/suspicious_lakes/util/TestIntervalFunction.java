@@ -1,6 +1,6 @@
-package com.gmail.guitaekm.enderlakes;
+package com.gmail.guitaekm.suspicious_lakes;
 
-import com.gmail.guitaekm.enderlakes.util.IntervalFunction;
+import com.gmail.guitaekm.suspicious_lakes.util.IntervalFunction;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
