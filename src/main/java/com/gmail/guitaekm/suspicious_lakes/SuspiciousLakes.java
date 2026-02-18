@@ -15,6 +15,7 @@ import net.minecraft.item.ItemGroups;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.sound.BlockSoundGroup;
@@ -42,6 +43,10 @@ public class SuspiciousLakes implements ModInitializer {
 			new SuspiciousFluid.Flowing()
 	);
 
+    public static<T> RegistryKey<T> getKey(RegistryKey<Registry<T>> key, String id) {
+        return RegistryKey.of(key, Identifier.of(MOD_ID, id));
+    }
+
 	public static final SuspiciousFluidBlock SUSPICIOUS_LIQUID_BLOCK = Registry.register(
 			Registries.BLOCK,
 			Identifier.of(MOD_ID, "suspicious_liquid"),
@@ -50,6 +55,7 @@ public class SuspiciousLakes implements ModInitializer {
 					AbstractBlock
 							.Settings
 							.create()
+                            .registryKey(getKey(RegistryKeys.BLOCK, "suspicious_liquid"))
 							.mapColor(MapColor.MAGENTA)
 							.replaceable()
 							.strength(100.0F)
@@ -65,7 +71,9 @@ public class SuspiciousLakes implements ModInitializer {
 			Identifier.of(MOD_ID, "suspicious_bucket"),
 			new BucketItem(
 					SUSPICIOUS_LIQUID_STILL_FLUID,
-					new Item.Settings().recipeRemainder(Items.BUCKET).maxCount(1)
+					new Item.Settings()
+                            .registryKey(getKey(RegistryKeys.ITEM, "suspicious_bucket"))
+                            .recipeRemainder(Items.BUCKET).maxCount(1)
 			)
 	);
 
