@@ -25,6 +25,11 @@
 - rename smallPrimeConfig (erl.)
 - ConfigInstance shouldn't depend on WorldBorderConfigUpdater (erl.)
 - is rotation turned on? (erl.)
-- enderlakes->suspiciouslakes
+- enderlakes->suspiciouslakes (erl.)
 - generate a single source to do the least destruction and convert air to endstone (erl.)
-- update at least to minecraft:1.21.1
+- update at least to minecraft:1.21.1 (erl.)
+- update wiki with flow interaction
+- test:
+	- flow interaction
+	- activation correctly assigned
+	- teleportation

@@ -15,6 +15,7 @@ import net.minecraft.util.shape.*;
 import net.minecraft.world.*;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.world.tick.ScheduledTickView;
 
 import java.util.Objects;
 import java.util.Set;
@@ -56,11 +57,11 @@ public class SuspiciousFluidBlock extends FluidBlock {
     }
 
     @Override
-    protected BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess worldAccess, BlockPos pos, BlockPos neighborPos) {
-        if (worldAccess instanceof World world) {
+    protected BlockState getStateForNeighborUpdate(BlockState state, WorldView worldView, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
+        if (worldView instanceof World world) {
             updateActivated(state, world, pos);
         }
-        return super.getStateForNeighborUpdate(state, direction, neighborState, worldAccess, pos, neighborPos);
+        return super.getStateForNeighborUpdate(state, worldView, tickView, pos, direction, neighborPos, neighborState, random);
     }
 
     @Override
@@ -152,7 +153,7 @@ public class SuspiciousFluidBlock extends FluidBlock {
                         toPosRaw.getX(),
                         toPosRaw.getZ()
                 );
-        lakeTopLayer = lakeTopLayer != -1 ? lakeTopLayer : world.getRandom().nextBetween(1, world.getTopY());
+        lakeTopLayer = lakeTopLayer != -1 ? lakeTopLayer : world.getRandom().nextBetween(1, world.getTopYInclusive());
         BlockPos emergencyLake = toPosRaw.withY(lakeTopLayer);
         if (!chunk.getBlockState(emergencyLake).getBlock().equals(SuspiciousLakes.SUSPICIOUS_LIQUID_BLOCK)) {
             chunk.setBlockState(emergencyLake, SuspiciousLakes.SUSPICIOUS_LIQUID_BLOCK.getDefaultState(), false);
@@ -177,7 +178,8 @@ public class SuspiciousFluidBlock extends FluidBlock {
                 targetPosition.z,
                 Set.of(),
                 entity.getYaw(),
-                entity.getPitch()
+                entity.getPitch(),
+                true
         );
         if (entity instanceof EnderPearlEntity enderPearl) {
             Entity owner = enderPearl.getOwner();
@@ -192,7 +194,7 @@ public class SuspiciousFluidBlock extends FluidBlock {
                     owner.getPitch(),
                     TeleportTarget.NO_OP
             ));
-            enderPearl.kill();
+            enderPearl.kill(serverWorld);
         }
         return true;
     }
@@ -210,7 +212,7 @@ public class SuspiciousFluidBlock extends FluidBlock {
     }
 
     @Override
-    protected boolean isTransparent(BlockState state, BlockView world, BlockPos pos) {
+    protected boolean isTransparent(BlockState state) {
         return true;
     }
 

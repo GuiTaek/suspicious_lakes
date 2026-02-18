@@ -6,11 +6,11 @@ import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.Item;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 import net.minecraft.block.entity.BlockEntity;
@@ -32,7 +32,7 @@ abstract public class SuspiciousFluid extends FlowableFluid {
     }
 
     @Override
-    protected boolean isInfinite(World world) {
+    protected boolean isInfinite(ServerWorld world) {
         return false;
     }
 
@@ -75,10 +75,6 @@ abstract public class SuspiciousFluid extends FlowableFluid {
     @Override
     protected BlockState toBlockState(FluidState state) {
         return SuspiciousLakes.SUSPICIOUS_LIQUID_BLOCK.getDefaultState().with(FluidBlock.LEVEL, getBlockStateLevel(state));
-    }
-    @Override
-    protected boolean receivesFlow(Direction face, BlockView world, BlockPos pos, BlockState state, BlockPos fromPos, BlockState fromState) {
-        return true;
     }
 
     public static class Flowing extends SuspiciousFluid {

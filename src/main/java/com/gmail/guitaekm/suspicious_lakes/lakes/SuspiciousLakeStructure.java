@@ -95,7 +95,7 @@ public class SuspiciousLakeStructure extends Structure {
             if (surface > context.world().getBottomY()) {
                 y = 1;
             } else {
-                y = context.random().nextBetween(context.world().getBottomY() + 2, context.world().getTopY() - 10);
+                y = context.random().nextBetween(context.world().getBottomY() + 2, context.world().getTopYInclusive() - 10);
             }
         } else {
             y = surface - this.depth;
@@ -143,11 +143,11 @@ public class SuspiciousLakeStructure extends Structure {
             StructureTemplateManager structureTemplateManager = context.structureTemplateManager();
             HeightLimitView heightLimitView = context.world();
             ChunkRandom chunkRandom = context.random();
-            Registry<StructurePool> registry = dynamicRegistryManager.get(RegistryKeys.TEMPLATE_POOL);
+            Registry<StructurePool> registry = dynamicRegistryManager.getOrThrow(RegistryKeys.TEMPLATE_POOL);
             BlockRotation blockRotation = BlockRotation.random(chunkRandom);
             StructurePool structurePoolWithDefault = structurePool.getKey()
                     .flatMap(
-                            (key) -> registry.getOrEmpty(aliasLookup.lookup(key)))
+                            (key) -> registry.getOptionalValue(aliasLookup.lookup(key)))
                     .orElse(structurePool.value());
             StructurePoolElement structurePoolElement = structurePoolWithDefault.getRandomElement(chunkRandom);
             BlockBox tempBoundingBox = structurePoolElement
