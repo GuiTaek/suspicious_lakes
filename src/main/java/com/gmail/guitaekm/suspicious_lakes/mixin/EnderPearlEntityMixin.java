@@ -6,8 +6,10 @@ package com.gmail.guitaekm.suspicious_lakes.mixin;
 import com.gmail.guitaekm.suspicious_lakes.SuspiciousLakes;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.entity.projectile.thrown.ThrownItemEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -16,6 +18,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 @Mixin(EnderPearlEntity.class)
 public abstract class EnderPearlEntityMixin extends ThrownItemEntity {
@@ -32,14 +37,12 @@ public abstract class EnderPearlEntityMixin extends ThrownItemEntity {
         World world = this.getWorld();
         BlockPos pos = blockHit.getBlockPos();
         BlockState state = world.getBlockState(pos);
-        if (!SuspiciousLakes.SUSPICIOUS_LIQUID_BLOCK.shouldTeleport(this, state, pos)) {
-            return;
-        }
-        boolean success = SuspiciousLakes.SUSPICIOUS_LIQUID_BLOCK.teleport(this.getWorld(), this, pos);
-        if (!success) {
+        if (!SuspiciousLakes.SUSPICIOUS_LIQUID_BLOCK.testTeleport(state, world, pos, this)) {
+            //noinspection UnnecessaryReturnStatement
             return;
         }
         // ChatGPT suggested it in order to be future-compatible
-        ci.cancel();
+        // right now, it's not necessary and I want the particles
+        // ci.cancel();
     }
 }

@@ -78,10 +78,9 @@ public class SuspiciousFluidBlock extends FluidBlock {
             if (entity.getType().isIn(SuspiciousLakes.PERMEABLE_BY_SUSPICIOUS_FLUID)) {
                 Box shrunkenRawShape = collisionShape
                         .getBoundingBox().contract(0.01);
-                if (!(world instanceof ServerWorld serverWorld)) {
+                if (!(world instanceof ServerWorld)) {
                     return collisionShape;
                 }
-                this.testTeleport(state, serverWorld, pos, entity);
                 return VoxelShapes.cuboid(shrunkenRawShape);
             }
         }
@@ -194,21 +193,16 @@ public class SuspiciousFluidBlock extends FluidBlock {
                     owner.getPitch(),
                     TeleportTarget.NO_OP
             ));
-            enderPearl.kill(serverWorld);
+            enderPearl.discard();
         }
         return true;
     }
 
-    public void testTeleport(BlockState state, World world, BlockPos pos, Entity entity) {
+    public boolean testTeleport(BlockState state, World world, BlockPos pos, Entity entity) {
         if (!this.shouldTeleport(entity, state, pos)) {
-            return;
+            return false;
         }
-        teleport(world, entity, pos);
-    }
-
-    @Override
-    protected void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
-        this.testTeleport(state, world, pos, entity);
+        return teleport(world, entity, pos);
     }
 
     @Override

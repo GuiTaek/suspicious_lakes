@@ -33,3 +33,5 @@
 	- flow interaction
 	- activation correctly assigned
 	- teleportation
+	- bathing works
+	- enderpearls work
