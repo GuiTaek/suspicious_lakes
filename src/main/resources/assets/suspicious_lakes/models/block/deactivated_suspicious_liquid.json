@@ -1,5 +1,5 @@
 {
   "textures": {
-    "particle": "block/lava_still"
+    "particle": "suspicious_lakes:block/deactivated_suspicious_liquid_still"
   }
 }
