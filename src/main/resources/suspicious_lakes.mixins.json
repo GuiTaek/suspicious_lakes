@@ -3,7 +3,8 @@
   "package": "com.gmail.guitaekm.suspicious_lakes.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "EnderPearlEntityMixin"
+    "EnderPearlEntityMixin",
+    "EntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

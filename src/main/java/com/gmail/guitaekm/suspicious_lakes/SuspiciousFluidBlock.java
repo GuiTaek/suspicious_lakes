@@ -119,6 +119,11 @@ public class SuspiciousFluidBlock extends FluidBlock {
         );
     }
 
+    @Override
+    protected void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+        ((EntityLakeTeleportScheduler)(Object) entity).suspiciousLakes$setRequestingBlock(pos);
+    }
+
     public boolean teleport(World world, Entity entity, BlockPos fromPos) {
         if (!WorldBorderConfigUpdater.INSTANCE.mayUseLakes()) {
             return false;

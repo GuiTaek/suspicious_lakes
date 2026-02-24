@@ -35,3 +35,4 @@
 	- teleportation
 	- bathing works
 	- enderpearls work
+	- liquid flows downwards
