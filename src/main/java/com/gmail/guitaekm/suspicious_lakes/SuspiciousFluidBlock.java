@@ -35,6 +35,9 @@ public class SuspiciousFluidBlock extends FluidBlock {
 
     public void updateActivated(BlockState state, World world, BlockPos pos) {
         boolean activated = world.getBiome(pos).isIn(SuspiciousLakes.HAS_STRUCTURE_SUSPICIOUS_LAKE);
+        if (state.get(ACTIVATED) == activated) {
+            return;
+        }
         world.setBlockState(pos, state.with(ACTIVATED, activated));
     }
 
