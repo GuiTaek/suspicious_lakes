@@ -73,7 +73,9 @@ public class SuspiciousFluidBlock extends FluidBlock {
         if (context instanceof EntityShapeContext entityShapeContext) {
             Entity entity = entityShapeContext.getEntity();
             if (entity == null) {
-                return collisionShape;
+                // helps to let the fluid flow downwards, because the fluid logic depends on
+                // the collision shape in this case because of water logging
+                return VoxelShapes.empty();
             }
             if (entity.getType().isIn(SuspiciousLakes.PERMEABLE_BY_SUSPICIOUS_FLUID)) {
                 Box shrunkenRawShape = collisionShape
