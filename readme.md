@@ -14,7 +14,7 @@ The group sizes of 2, 3, 4, 5, 6, 7 have the following ratios to appear: 5:5:3:3
 This block behaves like other liquids e.g. water or lava but it has a collision box, meaning you can stand on it and can't directly penetrate the liquid.
 
 ### Teleportation
-If you manage to penetrate the somehow, meaning that you're bathing in the liquid, you get immediately teleported as if you were bathing in the nearest lake. This also happens to other entities and the player if an enderpearl lands on an activated suspicious liquid. If the chunk-distance is equal to two lakes or more, the lake that you are assigned to is chosen at random. Suspicious Liquid only activates and therefore teleports if they are in on of the biomes:
+If you manage to penetrate the liquid somehow, meaning that you're bathing in the liquid, you get immediately teleported as if you were bathing in the nearest lake. This also happens to other entities and the player if an enderpearl lands on an activated suspicious liquid. If the chunk-distance is equal to two lakes or more, the lake that you are assigned to is chosen at random. Suspicious Liquid only activates and therefore teleports if it is in on of the biomes:
 - End Highlands
 - End Midlands
 - Small End Islands
