@@ -31,3 +31,9 @@ Short answer: Through so-called [permutations](https://en.wikipedia.org/wiki/Per
 
 # Will this come to neoforge?
 Unfortunately I started this project before I knew [Architectury](https://docs.architectury.dev/start) which makes creating mods for both fabric and neoforge a breeze. Adding architectury afterwards is so difficult it's easier to start from scratch.
+
+# Links
+[Modrinth](https://modrinth.com/mod/suspicious-lakes/versions)
+[Curseforge](https://www.curseforge.com/minecraft/mc-mods/suspicious-lakes/files/all?page=1&pageSize=20&showAlphaFiles=hide)
+[this Wiki](/readme.md)
+[Maths](/maths.md)
