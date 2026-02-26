@@ -1,6 +1,8 @@
 package com.gmail.guitaekm.suspicious_lakes;
 
 import com.gmail.guitaekm.suspicious_lakes.LakeDestinationFinder.GridPos;
+import net.minecraft.Bootstrap;
+import net.minecraft.SharedConstants;
 import net.minecraft.util.math.BlockPos;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -23,6 +25,15 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestLakeDestinationFinder {
     public static final Logger LOGGER = LoggerFactory.getLogger("lake_destination_tester");
 
+    static {
+        // have to be called before below ConfigInstances because
+        // they call minecraft code. See
+        // https://docs.fabricmc.net/1.21.1/develop/automatic-testing
+        // fortunately, java seems to respect order of static blocks
+        SharedConstants.createGameVersion();
+        Bootstrap.initialize();
+    }
+
     final private static ConfigInstance NORMAL_CONFIG =  new ConfigInstance();
 
     final private static ConfigInstance MIDDLE_CONFIG = new ConfigInstance(
@@ -35,7 +46,7 @@ public class TestLakeDestinationFinder {
             18
     );
 
-    static ConfigInstance SMALL_CONFIG = new ConfigInstance(
+    final private static ConfigInstance SMALL_CONFIG = new ConfigInstance(
             ConfigInstance.rawSource(19),
             ConfigValues.powerDistance,
             List.of(

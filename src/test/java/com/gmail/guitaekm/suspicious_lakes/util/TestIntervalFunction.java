@@ -1,4 +1,4 @@
-package com.gmail.guitaekm.suspicious_lakes;
+package com.gmail.guitaekm.suspicious_lakes.util;
 
 import com.gmail.guitaekm.suspicious_lakes.util.IntervalFunction;
 import org.junit.jupiter.api.Test;
