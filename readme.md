@@ -34,6 +34,9 @@ Unfortunately I started this project before I knew [Architectury](https://docs.a
 
 # Links
 [Modrinth](https://modrinth.com/mod/suspicious-lakes/versions)
+
 [Curseforge](https://www.curseforge.com/minecraft/mc-mods/suspicious-lakes/files/all?page=1&pageSize=20&showAlphaFiles=hide)
+
 [this Wiki](/readme.md)
+
 [Maths](/maths.md)
