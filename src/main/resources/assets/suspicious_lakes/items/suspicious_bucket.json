@@ -1,0 +1,6 @@
+{
+  "model": {
+	"type": "minecraft:model",
+	"model": "suspicious_lakes:item/suspicious_bucket"
+  }
+}
