@@ -2,6 +2,7 @@ package com.gmail.guitaekm.suspicious_lakes;
 
 import net.minecraft.block.*;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityCollisionHandler;
 import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
 import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.registry.tag.FluidTags;
@@ -125,7 +126,7 @@ public class SuspiciousFluidBlock extends FluidBlock {
     }
 
     @Override
-    protected void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+    protected void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity, EntityCollisionHandler handler) {
         ((EntityLakeTeleportScheduler)(Object) entity).suspiciousLakes$setRequestingBlock(pos);
     }
 
@@ -165,14 +166,14 @@ public class SuspiciousFluidBlock extends FluidBlock {
         lakeTopLayer = lakeTopLayer != -1 ? lakeTopLayer : world.getRandom().nextBetween(1, world.getTopYInclusive());
         BlockPos emergencyLake = toPosRaw.withY(lakeTopLayer);
         if (!chunk.getBlockState(emergencyLake).getBlock().equals(SuspiciousLakes.SUSPICIOUS_LIQUID_BLOCK)) {
-            chunk.setBlockState(emergencyLake, SuspiciousLakes.SUSPICIOUS_LIQUID_BLOCK.getDefaultState(), false);
+            chunk.setBlockState(emergencyLake, SuspiciousLakes.SUSPICIOUS_LIQUID_BLOCK.getDefaultState());
             for (Direction dir: Direction.values()) {
                 if (dir.equals(Direction.UP)) {
                     continue;
                 }
                 BlockPos endstonePos = emergencyLake.add(dir.getVector());
                 if (chunk.getBlockState(endstonePos).isIn(SuspiciousLakes.REPLACEABLE_BY_SUSPICIOUS_LAKES)) {
-                    chunk.setBlockState(endstonePos, Blocks.END_STONE.getDefaultState(), false);
+                    chunk.setBlockState(endstonePos, Blocks.END_STONE.getDefaultState());
                 }
             }
         }
