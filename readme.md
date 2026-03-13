@@ -26,6 +26,9 @@ I was careful about always generating a suspicious lake where the algorithm expe
 ### Interaction with other liquids
 When lava and suspicious liquid meet above bedrock after version 1.0.1, obsidian is formed. Any other interaction results in End Stone.
 
+## Interaction with other biomes
+Unfortunately due to technical reasons, In a mod pack or generally together with non-vanilla biomes, you need an extra datapack, see [this project](https://github.com/GuiTaek/suspicious_lakes_spawner).
+
 # How does this mod manage to "know" where to teleport you without generating additional chunks?
 Short answer: Through so-called [permutations](https://en.wikipedia.org/wiki/Permutation). Except for world border changes the complexity for every feature of this mod is constant. The code for changing the world border is only triggered when an actual lake teleport happens after a world border change and is still very fast. For the long answer, see [maths.md](maths.md)
 
@@ -38,5 +41,7 @@ Unfortunately I started this project before I knew [Architectury](https://docs.a
 [Curseforge](https://www.curseforge.com/minecraft/mc-mods/suspicious-lakes/files/all?page=1&pageSize=20&showAlphaFiles=hide)
 
 [this Wiki](/readme.md)
+
+[Datapack for non-vanilla biomes](https://github.com/GuiTaek/suspicious_lakes_spawner)
 
 [Maths](/maths.md)
