@@ -97,7 +97,7 @@ public class SuspiciousFluidBlock extends FluidBlock {
     // or inhibitTeleport
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean shouldTeleport(Entity entity, BlockState state, BlockPos pos) {
-        if (entity.getWorld().isClient) {
+        if (entity.getEntityWorld().isClient()) {
             return false;
         }
         if (!state.getBlock().equals(this)) {
@@ -107,7 +107,7 @@ public class SuspiciousFluidBlock extends FluidBlock {
             return false;
         }
         VoxelShape centeredCollisionShape = getFluidState(state)
-                .getShape(entity.getWorld(), pos);
+                .getShape(entity.getEntityWorld(), pos);
         VoxelShape movedCollisionShape = centeredCollisionShape
                 .offset(pos.getX(), pos.getY(), pos.getZ());
 

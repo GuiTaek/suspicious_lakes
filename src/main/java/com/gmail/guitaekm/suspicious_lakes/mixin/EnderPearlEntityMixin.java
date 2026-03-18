@@ -34,7 +34,7 @@ public abstract class EnderPearlEntityMixin extends ThrownItemEntity {
         if (!(hitResult instanceof BlockHitResult blockHit)) {
             return;
         }
-        World world = this.getWorld();
+        World world = this.getEntityWorld();
         BlockPos pos = blockHit.getBlockPos();
         BlockState state = world.getBlockState(pos);
         if (!SuspiciousLakes.SUSPICIOUS_LIQUID_BLOCK.testTeleport(state, world, pos, this)) {
